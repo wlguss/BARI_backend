@@ -1,0 +1,24 @@
+plugins {
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    id 'java'
+}
+
+dependencies {
+    implementation project(':libs:security')
+
+    implementation libs.spring.boot.web
+    implementation libs.spring.boot.jpa
+    implementation libs.spring.boot.security
+    implementation libs.spring.boot.actuator
+    implementation libs.spring.boot.validation
+
+    runtimeOnly libs.mariadb
+
+    implementation libs.springdoc.webmvc
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}

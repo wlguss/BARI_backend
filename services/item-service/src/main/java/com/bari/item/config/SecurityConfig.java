@@ -48,7 +48,7 @@ public class SecurityConfig {
                         // 아이템 조회는 인증 없이 접근 가능 (공개)
                         .requestMatchers(HttpMethod.GET, "/api/items", "/api/items/**").permitAll()
                         // Swagger UI는 누구나 접근 가능
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         // Actuator 헬스체크는 누구나 접근 가능
                         .requestMatchers("/actuator/**").permitAll()
                         // 나머지 (POST, PUT, DELETE)는 인증 필요

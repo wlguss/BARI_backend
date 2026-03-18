@@ -61,7 +61,7 @@ public class SecurityConfig {
                         // 인증 API는 누구나 접근 가능
                         .requestMatchers("/api/auth/**").permitAll()
                         // Swagger UI는 누구나 접근 가능
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         // Actuator 헬스체크는 누구나 접근 가능
                         .requestMatchers("/actuator/**").permitAll()
                         // 나머지는 인증 필요
