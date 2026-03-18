@@ -1,0 +1,28 @@
+plugins {
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    id 'java'
+}
+
+// Spring Cloud Gateway는 WebFlux(Netty) 기반 — spring-boot-starter-web과 충돌
+// libs:security는 WebMVC 기반이므로 의존하지 않고 JWT 로직을 직접 구현
+
+dependencies {
+    // Spring Boot BOM: spring-boot + spring-dependency-management 플러그인으로 자동 import
+    // Spring Cloud BOM: platform()으로 추가
+    implementation platform(libs.spring.cloud.bom)
+
+    // Spring Cloud Gateway (reactive / Netty)
+    implementation libs.spring.cloud.gateway
+
+    // JWT 검증 (JwtGatewayFilter에서 직접 사용)
+    implementation libs.jjwt.api
+    runtimeOnly libs.jjwt.impl
+    runtimeOnly libs.jjwt.jackson
+
+    // k8s 헬스체크용
+    implementation libs.spring.boot.actuator
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

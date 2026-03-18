@@ -1,0 +1,28 @@
+plugins {
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    id 'java'
+}
+
+// spring-boot + spring-dependency-management 동시 적용 시
+// Spring Boot BOM이 자동으로 import됨 — 별도 dependencyManagement 블록 불필요
+
+dependencies {
+    implementation project(':libs:security')
+
+    implementation libs.spring.boot.web
+    implementation libs.spring.boot.jpa
+    implementation libs.spring.boot.security
+    implementation libs.spring.boot.redis
+    implementation libs.spring.boot.actuator
+    implementation libs.spring.boot.validation
+
+    runtimeOnly libs.mariadb
+
+    implementation libs.springdoc.webmvc
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}

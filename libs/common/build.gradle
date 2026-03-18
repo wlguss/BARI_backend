@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+}
+
+// 라이브러리 모듈은 bootJar 비활성화, 일반 jar 활성화
+jar {
+    enabled = true
+}
+
+dependencies {
+    // Spring Boot BOM을 platform()으로 가져와 버전 중앙 관리
+    api platform(libs.spring.boot.bom)
+
+    api libs.spring.boot.web
+    api libs.spring.boot.jpa
+    api libs.spring.boot.validation
+    api libs.springdoc.webmvc
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

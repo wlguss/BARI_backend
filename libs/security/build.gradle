@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
+// 라이브러리 모듈은 bootJar 비활성화, 일반 jar 활성화
+jar {
+    enabled = true
+}
+
+dependencies {
+    // libs:common 의존 (spring.boot.bom platform 포함)
+    api project(':libs:common')
+
+    api libs.spring.boot.security
+
+    // JWT (jjwt 0.12.x)
+    api libs.jjwt.api
+    runtimeOnly libs.jjwt.impl
+    runtimeOnly libs.jjwt.jackson
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}

@@ -1,0 +1,30 @@
+{
+  "java.configuration.updateBuildConfiguration": "interactive",
+
+  // Semantic Highlighting 활성화
+  // 단순히 키워드 색칠이 아니라
+  // "이 식별자가 뭔지"를 컴파일러 수준에서 구분해서 색을 입힘
+  //
+  // 예:
+  // - class / interface / enum
+  // - field vs local variable
+  // - method vs constructor
+  //
+  // Java, Kotlin, TS 같은 정적 타입 언어에서 체감 큼
+  "editor.semanticHighlighting.enabled": true,
+
+  // 현재 줄 강조 방식
+  // "line" : 줄 전체를 은은하게 강조
+  // "all"  : 줄 + gutter(줄 번호)까지 강조
+  //
+  // 현재 내가 어디 타이핑 중인지 빠르게 인지 가능
+  // 긴 Java 파일에서 특히 중요
+  "editor.renderLineHighlight": "line",
+
+  // 괄호 쌍 색상 구분
+  // (), {}, [] 같은 괄호를 깊이(depth)별로 다른 색으로 표시
+  //
+  // if / for / try / lambda / builder 패턴 많은
+  // Java 코드에서 중괄호 추적 난이도 ↓↓↓
+  "editor.bracketPairColorization.enabled": true
+}

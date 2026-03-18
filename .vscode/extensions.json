@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    "aaron-bond.better-comments", // 주석을 더 깔끔하고 가독성 좋게 만들어주는 확장
+    "natqe.reload", // 파일 변경 시 자동으로 리로드해주는 확장
+
+    "adam-bender.commit-message-editor", // 커밋 메시지 편집을 도와주는 확장
+    "eamodio.gitlens", // Git 정보를 더 쉽게 확인하고 관리할 수 있게 도와주는 확장
+    "christian-kohler.path-intellisense", // 파일 경로 자동 완성 기능을 제공하는 확장
+
+    "redhat.java", // Java 언어 지원 핵심 확장 (자동완성, 에러검출, 포맷팅, 디버깅 기반)
+    "redhat.vscode-yaml", // YAML 파일 자동완성 및 검증 (application.yml 작성 시 필수)
+    "ms-azuretools.vscode-docker" // Docker 컨테이너/이미지 관리 및 로그 확인 (로컬 개발 환경 관리에 유용)
+
+    // "bierner.markdown-mermaid", // Markdown에서 Mermaid 다이어그램을 사용할 수 있게 해주는 확장
+    // "exodiusstudios.comment-anchors", // 코드 내 주석을 쉽게 관리할 수 있게 해주는 확장
+    // "ibm.output-colorizer", // 출력 콘솔에 색상을 추가하여 가독성을 높여주는 확장
+    // "nicegyuha.quick-console-log", // 빠르게 console.log를 삽입할 수 있는 확장
+    // "visualstudioexptteam.vscodeintellicode", // IntelliCode로 코드 추천을 더 똑똑하게 제공하는 확장
+  ]
+}
+
+// NOTE - 추천에 뜨지 않을 시 아래 코드 주석 해제 후 복사하여 터미널에 붙여넣기
+// code --install-extension aaron-bond.better-comments
