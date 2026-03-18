@@ -1,37 +1,37 @@
 -- ============================================================
 -- bari-backend 더미 데이터
--- 비밀번호 평문: password123
--- BCrypt 해시: $2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu
+-- 비밀번호 평문: p1234
+-- BCrypt 해시: $2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO
 -- ============================================================
 
 -- ===== users (25건) =====
 -- ADMIN 2명, OWNER 8명, USER 15명
 INSERT INTO users (email, password, nickname, role, created_at) VALUES
-('admin@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '시스템관리자',  'ADMIN', '2024-01-01 09:00:00'),
-('admin2@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '부관리자',      'ADMIN', '2024-01-02 09:00:00'),
-('owner1@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '김사장',        'OWNER', '2024-01-05 10:00:00'),
-('owner2@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '이사장',        'OWNER', '2024-01-06 10:00:00'),
-('owner3@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '박사장',        'OWNER', '2024-01-07 10:00:00'),
-('owner4@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '최사장',        'OWNER', '2024-01-08 10:00:00'),
-('owner5@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '정사장',        'OWNER', '2024-01-09 10:00:00'),
-('owner6@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '강사장',        'OWNER', '2024-01-10 10:00:00'),
-('owner7@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '윤사장',        'OWNER', '2024-01-11 10:00:00'),
-('owner8@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '조사장',        'OWNER', '2024-01-12 10:00:00'),
-('user1@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '홍길동',        'USER',  '2024-01-15 11:00:00'),
-('user2@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '이순신',        'USER',  '2024-01-16 11:00:00'),
-('user3@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '강감찬',        'USER',  '2024-01-17 11:00:00'),
-('user4@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '세종대왕',      'USER',  '2024-01-18 11:00:00'),
-('user5@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '유관순',        'USER',  '2024-01-19 11:00:00'),
-('user6@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '안중근',        'USER',  '2024-01-20 11:00:00'),
-('user7@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '윤봉길',        'USER',  '2024-01-21 11:00:00'),
-('user8@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '김구',          'USER',  '2024-01-22 11:00:00'),
-('user9@bari.com',   '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '박정희',        'USER',  '2024-01-23 11:00:00'),
-('user10@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '전두환',        'USER',  '2024-01-24 11:00:00'),
-('user11@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '노무현',        'USER',  '2024-01-25 11:00:00'),
-('user12@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '이명박',        'USER',  '2024-01-26 11:00:00'),
-('user13@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '박근혜',        'USER',  '2024-01-27 11:00:00'),
-('user14@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '문재인',        'USER',  '2024-01-28 11:00:00'),
-('user15@bari.com',  '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iKSgxo4r.T1n1lOeBwBdGG9.bPu', '윤석열',        'USER',  '2024-01-29 11:00:00');
+('admin@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '시스템관리자',  'ADMIN', '2024-01-01 09:00:00'),
+('admin2@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '부관리자',      'ADMIN', '2024-01-02 09:00:00'),
+('owner1@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '김사장',        'OWNER', '2024-01-05 10:00:00'),
+('owner2@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '이사장',        'OWNER', '2024-01-06 10:00:00'),
+('owner3@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '박사장',        'OWNER', '2024-01-07 10:00:00'),
+('owner4@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '최사장',        'OWNER', '2024-01-08 10:00:00'),
+('owner5@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '정사장',        'OWNER', '2024-01-09 10:00:00'),
+('owner6@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '강사장',        'OWNER', '2024-01-10 10:00:00'),
+('owner7@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '윤사장',        'OWNER', '2024-01-11 10:00:00'),
+('owner8@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '조사장',        'OWNER', '2024-01-12 10:00:00'),
+('user1@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '홍길동',        'USER',  '2024-01-15 11:00:00'),
+('user2@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '이순신',        'USER',  '2024-01-16 11:00:00'),
+('user3@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '강감찬',        'USER',  '2024-01-17 11:00:00'),
+('user4@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '세종대왕',      'USER',  '2024-01-18 11:00:00'),
+('user5@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '유관순',        'USER',  '2024-01-19 11:00:00'),
+('user6@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '안중근',        'USER',  '2024-01-20 11:00:00'),
+('user7@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '윤봉길',        'USER',  '2024-01-21 11:00:00'),
+('user8@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '김구',          'USER',  '2024-01-22 11:00:00'),
+('user9@bari.com',   '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '박정희',        'USER',  '2024-01-23 11:00:00'),
+('user10@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '전두환',        'USER',  '2024-01-24 11:00:00'),
+('user11@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '노무현',        'USER',  '2024-01-25 11:00:00'),
+('user12@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '이명박',        'USER',  '2024-01-26 11:00:00'),
+('user13@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '박근혜',        'USER',  '2024-01-27 11:00:00'),
+('user14@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '문재인',        'USER',  '2024-01-28 11:00:00'),
+('user15@bari.com',  '$2a$10$BIIgAwC866bPPUeSSEon0u3NhpXiKeWvmIB3UbfUdycS0mOgddQYO', '윤석열',        'USER',  '2024-01-29 11:00:00');
 
 -- ===== stores (10건) — owner_id는 OWNER role 유저 (id: 3~10) =====
 INSERT INTO stores (name, address, owner_id, created_at) VALUES

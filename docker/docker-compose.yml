@@ -1,4 +1,19 @@
-version: '3.8'
+# ============================================================
+# bari-backend 인프라
+#
+# [최초 실행]
+# docker compose -f docker/docker-compose.yml up -d
+#
+# [DB 스키마/더미데이터 변경 후 완전 초기화]
+# docker compose -f docker/docker-compose.yml down -v
+# docker compose -f docker/docker-compose.yml up -d
+# ※ -v 옵션: 볼륨(DB 데이터 포함)까지 삭제 후 재생성
+#
+# [컨테이너만 재시작 (데이터 유지)]
+# docker compose -f docker/docker-compose.yml restart
+# ============================================================
+
+name: bari-backend
 
 services:
   # ===== MariaDB =====
