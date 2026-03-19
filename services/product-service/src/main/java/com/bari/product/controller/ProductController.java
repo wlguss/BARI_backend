@@ -41,13 +41,13 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 특정 상품 정보 획득
+    // 전체 상품 정보 획득
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDTO> getById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getById(productId));
     }
 
-    // 전체 상품 정보 획득
+    // 특정 상품 정보 획득
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAll(
             @RequestParam(required = false) Long storeId,
