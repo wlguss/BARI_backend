@@ -1,5 +1,7 @@
 package com.bari.product.entity;
 
+import java.time.LocalDateTime;
+
 import com.bari.common.entity.BaseTimeEntity;
 import com.bari.product.dto.request.ProductRequestDTO;
 import com.bari.product.dto.request.ProductUpdateDTO;
@@ -14,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "products")
@@ -66,8 +69,4 @@ public class ProductEntity extends BaseTimeEntity {
         }
     }
 
-    // 삭제시간 등록  
-    public void softDelete() {
-        this.softDelete();
-    }
 }
