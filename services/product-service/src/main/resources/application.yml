@@ -1,3 +1,4 @@
+# 실행: ./gradlew :services:product-service:bootRun
 server:
   port: 8083
   shutdown: graceful
@@ -42,3 +43,13 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+# s3 설정 (실제 값 등록 필요)
+cloud:
+  aws:
+    region: ${AWS_REGION:ap-northeast-2}
+    credentials:
+     access-key: ${AWS_ACCESS_KEY}
+     secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET:bari-product-images}
