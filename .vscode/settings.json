@@ -26,5 +26,6 @@
   //
   // if / for / try / lambda / builder 패턴 많은
   // Java 코드에서 중괄호 추적 난이도 ↓↓↓
-  "editor.bracketPairColorization.enabled": true
+  "editor.bracketPairColorization.enabled": true,
+  "java.compile.nullAnalysis.mode": "automatic"
 }
