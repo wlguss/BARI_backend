@@ -28,8 +28,8 @@ public class ProductService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public ProductResponseDTO create(ProductRequestDTO request, String role) {
-        validateManagerRole(role);
+    public ProductResponseDTO create(ProductRequestDTO request, Long userId, String role) {
+        validateManager(userId, role);
 
         ProductEntity product = ProductEntity.create(request);
         ProductEntity saved = productRepository.save(product);
@@ -37,8 +37,7 @@ public class ProductService {
         eventPublisher.publishEvent(new ProductCreatedEvent(
                 saved.getId(),
                 saved.getStoreId(),
-                saved.getName()
-        ));
+                saved.getName()));
 
         return ProductResponseDTO.from(saved);
     }
@@ -52,7 +51,8 @@ public class ProductService {
         List<ProductEntity> products;
 
         if (storeId != null && hasText(keyword)) {
-            products = productRepository.findAllByStoreIdAndNameContainingIgnoreCaseAndDeletedAtIsNullOrderByIdDesc(storeId, keyword);
+            products = productRepository
+                    .findAllByStoreIdAndNameContainingIgnoreCaseAndDeletedAtIsNullOrderByIdDesc(storeId, keyword);
         } else if (storeId != null) {
             products = productRepository.findAllByStoreIdAndDeletedAtIsNullOrderByIdDesc(storeId);
         } else if (hasText(keyword)) {
@@ -67,31 +67,29 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponseDTO update(Long productId, ProductUpdateDTO request, String role) {
-        validateManagerRole(role);
+    public ProductResponseDTO update(Long productId, ProductUpdateDTO request, Long userId, String role) {
+        validateManager(userId, role);
 
         ProductEntity product = getActiveProduct(productId);
         product.update(request);
 
         eventPublisher.publishEvent(new ProductUpdatedEvent(
                 product.getId(),
-                product.getStoreId()
-        ));
+                product.getStoreId()));
 
         return ProductResponseDTO.from(product);
     }
 
     @Transactional
-    public void delete(Long productId, String role) {
-        validateManagerRole(role);
+    public void delete(Long productId, Long userId, String role) {
+        validateManager(userId, role);
 
         ProductEntity product = getActiveProduct(productId);
         product.softDelete();
 
         eventPublisher.publishEvent(new ProductDeletedEvent(
                 product.getId(),
-                product.getStoreId()
-        ));
+                product.getStoreId()));
     }
 
     private ProductEntity getActiveProduct(Long productId) {
@@ -99,9 +97,13 @@ public class ProductService {
                 .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
 
-    private void validateManagerRole(String role) {
+    private void validateManager(Long userId, String role) {
+        if (userId == null || userId <= 0) {
+            throw new ProductException(ProductErrorCode.INVALID_PRODUCT_ROLE);
+        }
+
         if (!"OWNER".equals(role) && !"ADMIN".equals(role)) {
-            throw new ProductException(ProductErrorCode.INVALID_PRODUCT_ROLE) ;
+            throw new ProductException(ProductErrorCode.INVALID_PRODUCT_ROLE);
         }
     }
 

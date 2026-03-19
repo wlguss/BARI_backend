@@ -30,12 +30,14 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // 상품정보 등록 
+    // 상품정보 등록
     @PostMapping
     public ResponseEntity<ProductResponseDTO> create(
             @Valid @RequestBody ProductRequestDTO request,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestHeader("X-User-Role") String role) {
-        ProductResponseDTO response = productService.create(request, role);
+
+        ProductResponseDTO response = productService.create(request, userId, role);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -45,7 +47,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getById(productId));
     }
 
-    // 전체 상품 정보 획득 
+    // 전체 상품 정보 획득
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAll(
             @RequestParam(required = false) Long storeId,
@@ -53,21 +55,25 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAll(storeId, keyword));
     }
 
-    // 상품 정보 수정 
+    // 상품 정보 수정
     @PutMapping("/{productId}")
     public ResponseEntity<ProductResponseDTO> update(
             @PathVariable Long productId,
             @Valid @RequestBody ProductUpdateDTO request,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestHeader("X-User-Role") String role) {
-        return ResponseEntity.ok(productService.update(productId, request, role));
+
+        return ResponseEntity.ok(productService.update(productId, request, userId, role));
     }
 
-    // 상품 정보 삭제 (softDelete 방식)
+    // 상품 정보 삭제 (soft delete 방식)
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long productId,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestHeader("X-User-Role") String role) {
-        productService.delete(productId, role);
+
+        productService.delete(productId, userId, role);
         return ResponseEntity.noContent().build();
     }
 }
