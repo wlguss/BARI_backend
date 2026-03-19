@@ -18,9 +18,12 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
 
-# s3 
+# s3 설정 (실제 값 등록 필요)
 cloud:
   aws:
-    region: ap-northeast-2
+    region: ${AWS_REGION:ap-northeast-2}
+    credentials:
+     access-key: ${AWS_ACCESS_KEY}
+     secret-key: ${AWS_SECRET_KEY}
     s3:
-      bucket: bari-product-images
+      bucket: ${AWS_S3_BUCKET:bari-product-images}
