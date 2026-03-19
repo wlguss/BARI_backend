@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,27 +21,22 @@ public class Store {
     private Long id;
 
     @Column(name = "name", nullable = false, length = 100)
-    private String storeName;
+    private String name;
 
-    // 매장 상세 페이지 소개글
     @Column(length = 500)
     private String description;
 
     @Column(length = 255)
     private String address;
 
-    // 매장 전화번호 (프론트 StoreDetail에서 사용)
     @Column(length = 20)
     private String phone;
 
-    // 영업 시간 (예: "09:00 - 22:00")
     @Column(name = "business_hours")
     private String businessHours;
 
-    // 카테고리
     private String category;
 
-    // 매장 대표 이미지 URL
     @Column(name = "image_url")
     private String imageUrl;
 

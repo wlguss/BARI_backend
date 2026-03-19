@@ -25,7 +25,7 @@ public class StoreController {
     }
 
     /**
-     * 2. 특정 매장 상세 조회
+     * 2. 특정 매장 상세 조회 (RQ-1003)
      */
     @GetMapping("/{id}")
     public ResponseEntity<StoreResponseDto> getStoreDetail(@PathVariable Long id) {
@@ -33,15 +33,19 @@ public class StoreController {
     }
 
     /**
-     * 3. 매장 정보 수정 (매장 전용)
+     * 3. 매장 정보 수정 (RQ-1004)
      */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateStore(
-            @PathVariable Long id, 
-            @RequestBody StoreRequestDto requestDto) {
+            @PathVariable("id") Long id, 
+            @RequestBody StoreRequestDto requestDto) { 
+        
+       
+        System.out.println("수정 요청 ID: " + id);
+        System.out.println("수정 내용: " + requestDto.toString());
         
         storeService.updateStore(id, requestDto);
-        return ResponseEntity.ok().build(); 
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -51,5 +55,15 @@ public class StoreController {
     public ResponseEntity<Long> createStore(@RequestBody StoreRequestDto requestDto) {
         Long storeId = storeService.createStore(requestDto);
         return ResponseEntity.ok(storeId);
+    }
+
+    /**
+     * 5. 매장 삭제 
+     * 실제 데이터를 지우지 않고 deleted_at 컬럼을 업데이트합니다.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStore(@PathVariable Long id) {
+        storeService.deleteStore(id);
+        return ResponseEntity.noContent().build(); // 204 No Content 반환
     }
 }

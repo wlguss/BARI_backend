@@ -25,7 +25,7 @@ public class StoreResponseDto {
     public static StoreResponseDto from(Store store) {
         return StoreResponseDto.builder()
                 .id(store.getId())
-                .storeName(store.getStoreName())
+                .storeName(store.getName())
                 .description(store.getDescription())
                 .address(store.getAddress())
                 .phone(store.getPhone())

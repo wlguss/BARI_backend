@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class StoreRequestDto {
-    private String storeName;
+    private String name;
     private String description;
     private String address;
     private String phone;
