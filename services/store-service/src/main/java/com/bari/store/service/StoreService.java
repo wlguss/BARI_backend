@@ -47,6 +47,7 @@ public class StoreService {
     public void updateStore(Long id, StoreRequestDto requestDto) {
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 매장이 존재하지 않습니다. id=" + id));
+                
         store.setName(requestDto.getName()); // 엔티티의 name 필드 수정
         store.setDescription(requestDto.getDescription());
         store.setAddress(requestDto.getAddress());
