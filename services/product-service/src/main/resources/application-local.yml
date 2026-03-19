@@ -5,7 +5,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
 
   datasource:
     url: jdbc:mariadb://localhost:3306/bari
@@ -17,3 +17,10 @@ logging:
     com.bari: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+
+# s3 
+cloud:
+  aws:
+    region: ap-northeast-2
+    s3:
+      bucket: bari-product-images

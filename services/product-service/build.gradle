@@ -5,13 +5,18 @@ plugins {
 }
 
 dependencies {
+    implementation project(':libs:common') 
     implementation project(':libs:security')
 
     implementation libs.spring.boot.web
     implementation libs.spring.boot.jpa
     implementation libs.spring.boot.security
+    implementation libs.spring.boot.redis
     implementation libs.spring.boot.actuator
     implementation libs.spring.boot.validation
+
+    implementation "software.amazon.awssdk:s3:2.25.53"
+
 
     runtimeOnly libs.mariadb
 
