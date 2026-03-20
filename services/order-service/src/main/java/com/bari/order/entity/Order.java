@@ -38,7 +38,7 @@ public class Order extends BaseTimeEntity {
 
     /**
      * 주문 상품 ID.
-     * TODO: product-service 연동 시 productId 유효성 검증 필요
+     * 유효성 검증: OrderService.reserve() 에서 ProductServiceClient를 통해 수행
      * product-service: GET /api/internal/products/{productId}
      */
     @Column(name = "product_id", nullable = false)
