@@ -1,6 +1,8 @@
 package com.bari.order.service;
 
 import com.bari.common.exception.BusinessException;
+import com.bari.order.client.ProductServiceClient;
+import com.bari.order.dto.client.ProductInfo;
 import com.bari.order.dto.request.ReserveRequest;
 import com.bari.order.dto.request.UpdateOrderStatusRequest;
 import com.bari.order.dto.response.OrderResponse;
@@ -32,6 +34,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProductServiceClient productServiceClient;
 
     // ========== 고객 API ==========
 
@@ -73,8 +76,9 @@ public class OrderService {
         // TODO: store-service 연동 - 매장 존재 여부 및 영업 상태 검증 (동기)
         // store-service: GET /api/internal/stores/{storeId}
 
-        // TODO: product-service 연동 - 상품 존재 여부 검증 (동기)
-        // product-service: GET /api/internal/products/{productId}
+        // 상품 존재 여부 검증 (product-service 동기 호출)
+        ProductInfo product = productServiceClient.getProduct(request.getProductId());
+        log.debug("상품 검증 완료 - productId: {}, name: {}", product.getId(), product.getName());
 
         // TODO: inventory-service 연동 - 재고 수량 확인 (동기)
         // inventory-service: GET /api/internal/inventory/{productId}
