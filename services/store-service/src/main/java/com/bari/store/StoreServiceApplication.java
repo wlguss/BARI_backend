@@ -16,7 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  *
  * 포트: 8082
  */
-@EnableJpaAuditing
+
 @SpringBootApplication(scanBasePackages = "com.bari")
 public class StoreServiceApplication {
 
