@@ -21,4 +21,17 @@ dependencies {
     annotationProcessor libs.lombok
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // feign 
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' 
+    // circuitbreak 
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j' 
+    // kafka 
+    implementation 'org.springframework.kafka:spring-kafka'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0'
+    }
 }
