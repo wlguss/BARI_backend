@@ -1,0 +1,44 @@
+server:
+  port: 8085
+  shutdown: graceful
+
+spring:
+  application:
+    name: discount-service
+
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
+    username: ${DB_USERNAME:bari}
+    password: ${DB_PASSWORD:bari1234}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+# JWT 설정 (32자 이상 시크릿 키 필수)
+jwt:
+  secret: ${JWT_SECRET:bari-super-secret-key-must-be-at-least-32-chars}
+
+# Actuator 설정
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# Swagger UI 설정
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
