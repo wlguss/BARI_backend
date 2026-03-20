@@ -28,4 +28,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return 중복이면 true
      */
     boolean existsByEmail(String email);
+
+    /**
+     * ID로 사용자 조회 (삭제되지 않은 사용자만).
+     * 내 정보 조회, 회원 탈퇴 시 사용합니다.
+     *
+     * @param id 사용자 ID
+     * @return 사용자 Optional
+     */
+    Optional<User> findByIdAndDeletedAtIsNull(Long id);
 }
