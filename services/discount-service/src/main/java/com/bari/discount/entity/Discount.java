@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "discounts")
+@Table(name = "discount")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -30,7 +30,6 @@ public class Discount {
 
     private Integer originalPrice;
     private Integer discountPrice;
-    private Integer discountRate;
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
@@ -44,8 +43,7 @@ public class Discount {
     }
 
     // 할인 수정
-    public void update(Integer discountRate, Integer discountPrice) {
-        this.discountRate = discountRate;
+    public void update(Integer discountPrice) {
         this.discountPrice = discountPrice;
     }
 

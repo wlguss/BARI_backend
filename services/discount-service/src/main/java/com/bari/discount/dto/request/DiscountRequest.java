@@ -17,17 +17,15 @@ public class DiscountRequest {
 
     private Long inventoryId;
     private Integer originalPrice;
-    private Integer discountRate;
+    private Integer discountPrice;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
     public Discount toEntity() {
-        int discountPrice = originalPrice - (originalPrice * discountRate / 100);
 
         return Discount.builder()
                 .inventoryId(inventoryId)
                 .originalPrice(originalPrice)
-                .discountRate(discountRate)
                 .discountPrice(discountPrice)
                 .startAt(startAt != null ? startAt : LocalDateTime.now())
                 .endAt(endAt)

@@ -53,9 +53,7 @@ public class DiscountService {
         Discount discount = discountRepository.findById(id)
                 .orElseThrow();
 
-        int discountPrice = dto.getOriginalPrice() - (dto.getOriginalPrice() * dto.getDiscountRate() / 100);
-
-        discount.update(dto.getDiscountRate(), discountPrice);
+        discount.update(dto.getDiscountPrice());
 
         return DiscountResponse.from(discount);
     }

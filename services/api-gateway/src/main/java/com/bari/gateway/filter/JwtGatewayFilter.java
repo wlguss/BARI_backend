@@ -57,16 +57,14 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
             "/api/auth/login",
             "/api/auth/signup",
             "/actuator/**",
-            "/actuator/health/**"
-    );
+            "/actuator/health/**");
 
     /**
      * 조회 요청은 인증 없이 허용 (GET 메서드 + 특정 경로)
      */
     private static final List<String> PUBLIC_GET_PATHS = List.of(
             "/api/items",
-            "/api/items/**"
-    );
+            "/api/items/**");
 
     @PostConstruct
     public void init() {

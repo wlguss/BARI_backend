@@ -7,9 +7,9 @@ import com.bari.inventory.dto.request.RequestDiscount;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
-@FeignClient(name = "discount-service")
+@FeignClient(name = "discount-service", url = "http://localhost:8085")
 public interface DiscountFeignService {
 
-    @PostMapping("/api/v1/discounts")
+    @PostMapping("/api/store/discounts/internal")
     void createDiscount(@RequestBody RequestDiscount dto);
 }

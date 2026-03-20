@@ -31,7 +31,7 @@ public class InventoryService {
         RequestDiscount discountDto = RequestDiscount.builder()
                 .inventoryId(saved.getId())
                 .originalPrice(dto.getOriginalPrice())
-                .discountRate(dto.getDiscountRate())
+                .discountPrice(dto.getDiscountPrice())
                 .build();
 
         discountClient.createDiscount(discountDto);

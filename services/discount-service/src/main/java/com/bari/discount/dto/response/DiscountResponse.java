@@ -13,7 +13,6 @@ public class DiscountResponse {
 
     private Long id;
     private Long inventoryId;
-    private Integer discountRate;
     private Integer discountPrice;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
@@ -22,7 +21,6 @@ public class DiscountResponse {
         return DiscountResponse.builder()
                 .id(d.getId())
                 .inventoryId(d.getInventoryId())
-                .discountRate(d.getDiscountRate())
                 .discountPrice(d.getDiscountPrice())
                 .startAt(d.getStartAt())
                 .endAt(d.getEndAt())

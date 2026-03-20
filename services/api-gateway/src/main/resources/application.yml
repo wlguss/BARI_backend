@@ -24,6 +24,18 @@ spring:
           uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8083}
           predicates:
             - Path=/api/products/**
+        
+        # inventory-service 라우팅 
+        - id: inventory-service
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8084}
+          predicates:
+            - Path=/api/inventory/**
+
+        # discount-service 라우팅 
+        - id: discount-service
+          uri: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8085}
+          predicates:
+            - Path=/api/discounts/**
 
 # JWT 시크릿 키 (32자 이상 필수)
 jwt:

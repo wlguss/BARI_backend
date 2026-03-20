@@ -14,7 +14,7 @@ public class InventoryRequest {
 
     // discount
     private Integer originalPrice;
-    private Integer discountRate;
+    private Integer discountPrice;
 
     public Inventory toEntity() {
         return Inventory.builder()
