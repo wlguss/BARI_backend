@@ -1,16 +1,10 @@
 server:
-  port: 8082
+  port: 8087
   shutdown: graceful
 
 spring:
   application:
-    name: store-service
-    
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration  
-
+    name: item-service
 
   datasource:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
@@ -20,14 +14,15 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
 
-# JWT 설정 (32자 이상 시크릿 키 필수)
+# JWT 설정 — item-service는 JWT를 직접 사용하지 않지만
+# libs:security의 JwtTokenProvider(@Component)가 스캔되므로 설정 필요
 jwt:
   secret: ${JWT_SECRET:bari-super-secret-key-must-be-at-least-32-chars}
 

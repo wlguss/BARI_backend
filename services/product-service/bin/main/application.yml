@@ -1,16 +1,11 @@
+# 실행: ./gradlew :services:product-service:bootRun
 server:
-  port: 8082
+  port: 8083
   shutdown: graceful
 
 spring:
   application:
-    name: store-service
-    
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration  
-
+    name: product-service
 
   datasource:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
@@ -20,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -48,3 +43,13 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+# s3 설정 (실제 값 등록 필요)
+cloud:
+  aws:
+    region: ${AWS_REGION:ap-northeast-2}
+    credentials:
+     access-key: ${AWS_ACCESS_KEY}
+     secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET:bari-product-images}
