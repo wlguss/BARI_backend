@@ -8,6 +8,7 @@ dependencies {
     implementation project(':libs:security')
 
     implementation libs.spring.boot.web
+    implementation 'org.springframework.kafka:spring-kafka'
     implementation libs.spring.boot.jpa
     implementation libs.spring.boot.security
     implementation libs.spring.boot.actuator

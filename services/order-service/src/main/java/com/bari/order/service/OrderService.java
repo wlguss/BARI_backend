@@ -1,17 +1,22 @@
 package com.bari.order.service;
 
 import com.bari.common.exception.BusinessException;
+import com.bari.order.client.ProductServiceClient;
+import com.bari.order.dto.client.ProductInfo;
 import com.bari.order.dto.request.ReserveRequest;
 import com.bari.order.dto.request.UpdateOrderStatusRequest;
 import com.bari.order.dto.response.OrderResponse;
 import com.bari.order.entity.Order;
 import com.bari.order.entity.OrderStatus;
+import com.bari.order.event.OrderCancelledEvent;
+import com.bari.order.event.OrderReservedEvent;
 import com.bari.order.exception.OrderErrorCode;
 import com.bari.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OrderService {
 
+    private static final String TOPIC_ORDER_RESERVED  = "order.reserved";
+    private static final String TOPIC_ORDER_CANCELLED = "order.cancelled";
+
     private final OrderRepository orderRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProductServiceClient productServiceClient;
 
     // ========== 고객 API ==========
 
@@ -66,8 +76,9 @@ public class OrderService {
         // TODO: store-service 연동 - 매장 존재 여부 및 영업 상태 검증 (동기)
         // store-service: GET /api/internal/stores/{storeId}
 
-        // TODO: product-service 연동 - 상품 존재 여부 검증 (동기)
-        // product-service: GET /api/internal/products/{productId}
+        // 상품 존재 여부 검증 (product-service 동기 호출)
+        ProductInfo product = productServiceClient.getProduct(request.getProductId());
+        log.debug("상품 검증 완료 - productId: {}, name: {}", product.getId(), product.getName());
 
         // TODO: inventory-service 연동 - 재고 수량 확인 (동기)
         // inventory-service: GET /api/internal/inventory/{productId}
@@ -75,7 +86,11 @@ public class OrderService {
 
         Order order = request.toEntity(customerId);
         Order saved = orderRepository.save(order);
+
+        // 재고 차감 이벤트 발행 → inventory-service가 수신하여 처리
+        kafkaTemplate.send(TOPIC_ORDER_RESERVED, String.valueOf(saved.getId()), OrderReservedEvent.from(saved));
         log.info("픽업 예약 완료 - orderId: {}, customerId: {}, storeId: {}", saved.getId(), customerId, saved.getStoreId());
+
         return OrderResponse.from(saved);
     }
 
@@ -102,10 +117,10 @@ public class OrderService {
             throw new BusinessException(OrderErrorCode.ORDER_CANNOT_CANCEL);
         }
 
-        // TODO: inventory-service 연동 - 재고 복구 이벤트 발행 (Kafka)
-        // KafkaTemplate으로 "order.cancelled" 토픽에 이벤트 발행
-
         order.cancel();
+
+        // 재고 복구 이벤트 발행 → inventory-service가 수신하여 처리
+        kafkaTemplate.send(TOPIC_ORDER_CANCELLED, String.valueOf(order.getId()), OrderCancelledEvent.from(order));
         log.info("주문 취소 완료 - orderId: {}, customerId: {}", orderId, customerId);
         return OrderResponse.from(order);
     }
