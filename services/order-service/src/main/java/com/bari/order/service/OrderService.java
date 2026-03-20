@@ -6,12 +6,15 @@ import com.bari.order.dto.request.UpdateOrderStatusRequest;
 import com.bari.order.dto.response.OrderResponse;
 import com.bari.order.entity.Order;
 import com.bari.order.entity.OrderStatus;
+import com.bari.order.event.OrderCancelledEvent;
+import com.bari.order.event.OrderReservedEvent;
 import com.bari.order.exception.OrderErrorCode;
 import com.bari.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OrderService {
 
+    private static final String TOPIC_ORDER_RESERVED  = "order.reserved";
+    private static final String TOPIC_ORDER_CANCELLED = "order.cancelled";
+
     private final OrderRepository orderRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     // ========== 고객 API ==========
 
@@ -75,7 +82,11 @@ public class OrderService {
 
         Order order = request.toEntity(customerId);
         Order saved = orderRepository.save(order);
+
+        // 재고 차감 이벤트 발행 → inventory-service가 수신하여 처리
+        kafkaTemplate.send(TOPIC_ORDER_RESERVED, String.valueOf(saved.getId()), OrderReservedEvent.from(saved));
         log.info("픽업 예약 완료 - orderId: {}, customerId: {}, storeId: {}", saved.getId(), customerId, saved.getStoreId());
+
         return OrderResponse.from(saved);
     }
 
@@ -102,10 +113,10 @@ public class OrderService {
             throw new BusinessException(OrderErrorCode.ORDER_CANNOT_CANCEL);
         }
 
-        // TODO: inventory-service 연동 - 재고 복구 이벤트 발행 (Kafka)
-        // KafkaTemplate으로 "order.cancelled" 토픽에 이벤트 발행
-
         order.cancel();
+
+        // 재고 복구 이벤트 발행 → inventory-service가 수신하여 처리
+        kafkaTemplate.send(TOPIC_ORDER_CANCELLED, String.valueOf(order.getId()), OrderCancelledEvent.from(order));
         log.info("주문 취소 완료 - orderId: {}, customerId: {}", orderId, customerId);
         return OrderResponse.from(order);
     }
