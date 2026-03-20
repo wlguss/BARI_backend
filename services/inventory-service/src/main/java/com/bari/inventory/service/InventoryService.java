@@ -3,6 +3,7 @@ package com.bari.inventory.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,10 +75,7 @@ public class InventoryService {
     public void expireInventories() {
         int count = inventoryRepository.bulkSoftDelete(LocalDateTime.now());
     }
-    
 
-
-    
     // 유통기한 임박 조회
     @Transactional(readOnly = true)
     public List<InventoryResponse> findNearExpire() {
@@ -91,4 +89,21 @@ public class InventoryService {
                 .map(InventoryResponse::fromEntity)
                 .toList();
     }
+    /*
+    @KafkaListener(topics = "update-stock-topic")
+    public void stockConsumer(String message) {
+
+        
+        try {
+            productUpdateDto = objectMapper.readValue(message, ProductUpdateDto.class);
+            ProductEntity productEntity = productRepository
+                    .findById(productUpdateDto.getProductId())
+                    .orElseThrow(() -> new RuntimeException("상품이 존재하지 않음"));
+            productEntity.updateStockQty(productUpdateDto.getQty());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    */
 }
