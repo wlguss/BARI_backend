@@ -7,7 +7,8 @@ import lombok.Getter;
 @Builder
 public class ProductImagePresignResponse {
 
-    private String uploadUrl;
-    private String imageUrl;
+    private String presignedUrl;
     private String key;
+    private String imageUrl;
+    private Long expiresIn;
 }
