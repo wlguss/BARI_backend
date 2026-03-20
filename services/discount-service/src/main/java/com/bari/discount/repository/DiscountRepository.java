@@ -1,5 +1,6 @@
 package com.bari.discount.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -14,5 +15,5 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
 
     Optional<Discount> findByIdAndDeletedAtIsNull(Long id);
 
-    Optional<Discount> findByInventoryIdAndDeletedAtIsNull(Long inventoryId);
+    List<Discount> findByInventoryIdAndDeletedAtIsNull(Long inventoryId);
 }
