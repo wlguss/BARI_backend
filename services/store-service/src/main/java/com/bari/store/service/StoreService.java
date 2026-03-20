@@ -85,6 +85,32 @@ public class StoreService {
     }
 
     /**
+     * [내부] 매장 단건 조회 (order-service 등 내부 서비스 통신용).
+     * 삭제된 매장은 조회되지 않습니다.
+     */
+    public StoreResponseDto getStoreForInternal(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 매장이 존재하지 않습니다. id=" + storeId));
+        if (store.getDeletedAt() != null) {
+            throw new IllegalArgumentException("삭제된 매장입니다. id=" + storeId);
+        }
+        return StoreResponseDto.from(store);
+    }
+
+    /**
+     * [내부] ownerId로 매장 조회 (order-service 매장 주문 조회용).
+     * 사장님 userId로 소유 매장을 반환합니다.
+     */
+    public StoreResponseDto getStoreByOwnerId(Long ownerId) {
+        Store store = storeRepository.findByOwner_Id(ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 매장이 존재하지 않습니다. ownerId=" + ownerId));
+        if (store.getDeletedAt() != null) {
+            throw new IllegalArgumentException("삭제된 매장입니다. ownerId=" + ownerId);
+        }
+        return StoreResponseDto.from(store);
+    }
+
+    /**
      * 5. 매장 삭제 (Soft Delete 및 중복 삭제 예외 처리)
      */
     @Transactional
