@@ -18,9 +18,6 @@ public class InventoryRequest {
 
     private Integer originalPrice;
 
-    
-    private List<RequestDiscount> discounts;
-
     public Inventory toEntity() {
         return Inventory.builder()
                 .productId(productId)

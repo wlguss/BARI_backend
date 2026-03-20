@@ -14,6 +14,7 @@ import com.bari.inventory.dto.request.RequestDiscount;
 import com.bari.inventory.dto.response.InventoryResponse;
 import com.bari.inventory.entity.Inventory;
 import com.bari.inventory.repository.InventoryRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,8 +55,8 @@ public class InventoryService {
     }
 
     // 재고 수정
-    public void update(Long id, InventoryUpdateRequest dto) {
-        Inventory inventory = inventoryRepository.findById(id)
+    public void update(InventoryUpdateRequest dto) {
+        Inventory inventory = inventoryRepository.findById(dto.getInventoryId())
                 .orElseThrow();
 
         inventory.update(dto);
@@ -89,21 +90,21 @@ public class InventoryService {
                 .map(InventoryResponse::fromEntity)
                 .toList();
     }
-    /*
-    @KafkaListener(topics = "update-stock-topic")
-    public void stockConsumer(String message) {
 
-        
+    @KafkaListener(topics = "update-quantity-topic")
+    public void quantityConsumer(String message) {
+
+        InventoryUpdateRequest request = null;
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            productUpdateDto = objectMapper.readValue(message, ProductUpdateDto.class);
-            ProductEntity productEntity = productRepository
-                    .findById(productUpdateDto.getProductId())
+            request = objectMapper.readValue(message, InventoryUpdateRequest.class);
+            Inventory inventory = inventoryRepository
+                    .findById(request.getInventoryId())
                     .orElseThrow(() -> new RuntimeException("상품이 존재하지 않음"));
-            productEntity.updateStockQty(productUpdateDto.getQty());
+            inventory.updateQuantity(request.getQuantity());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-    */
 }

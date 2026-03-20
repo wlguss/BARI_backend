@@ -49,14 +49,12 @@ public class InventoryController {
     }
 
     // RQ-3003 재고 수정
-    @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateInventory(@PathVariable Long inventoryId, @RequestBody InventoryUpdateRequest dto) {
-            
-        inventoryService.update(inventoryId, dto);
+    @PutMapping
+    public ResponseEntity<?> updateInventory(@RequestBody InventoryUpdateRequest dto) {
+
+        inventoryService.update(dto);
         return ResponseEntity.ok().build();
     }
-
-    
 
     // RQ-3004 재고 삭제 (soft delete)
     @DeleteMapping("/{itemId}")

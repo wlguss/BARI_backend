@@ -38,6 +38,10 @@ public class Inventory extends BaseTimeEntity {
         this.expireAt = dto.getExpireAt();
     }
 
+    public void updateQuantity(int quantity) {
+        this.quantity = this.quantity - quantity;
+    }
+
     public boolean isExpired() {
         return this.expireAt.isBefore(LocalDateTime.now());
     }
