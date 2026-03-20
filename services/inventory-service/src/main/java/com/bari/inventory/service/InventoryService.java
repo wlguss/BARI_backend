@@ -22,27 +22,13 @@ import lombok.RequiredArgsConstructor;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final DiscountFeignService discountClient;
+    // private final DiscountFeignService discountClient;
 
     // 재고 등록
     public InventoryResponse create(InventoryRequest dto) {
 
         Inventory inventory = dto.toEntity();
         Inventory saved = inventoryRepository.save(inventory);
-
-        if (dto.getDiscounts() != null) {
-            for (RequestDiscount d : dto.getDiscounts()) {
-                RequestDiscount discountDto = RequestDiscount.builder()
-                        .inventoryId(saved.getId())
-                        .originalPrice(d.getOriginalPrice())
-                        .discountPrice(d.getDiscountPrice())
-                        .startAt(d.getStartAt())
-                        .endAt(d.getEndAt())
-                        .build();
-
-                discountClient.createDiscount(discountDto);
-            }
-        }
 
         return InventoryResponse.fromEntity(saved);
     }
@@ -91,6 +77,7 @@ public class InventoryService {
     
 
 
+    
     // 유통기한 임박 조회
     @Transactional(readOnly = true)
     public List<InventoryResponse> findNearExpire() {
