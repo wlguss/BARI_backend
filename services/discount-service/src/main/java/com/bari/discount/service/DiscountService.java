@@ -66,6 +66,6 @@ public class DiscountService {
 
         // 요구사항: end_at 또는 deleted_at
         discount.end(); // 종료 처리
-        discount.delete(); // soft delete
+        discount.softDelete(); // soft delete
     }
 }

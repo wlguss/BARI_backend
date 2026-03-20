@@ -2,6 +2,9 @@ package com.bari.inventory.entity;
 
 import java.time.LocalDateTime;
 
+import com.bari.common.entity.BaseTimeEntity;
+import com.bari.inventory.dto.request.InventoryUpdateRequest;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Inventory {
+public class Inventory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +33,9 @@ public class Inventory {
 
     private LocalDateTime expireAt;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime deletedAt;
-
-    public void update(Integer quantity, LocalDateTime expireAt) {
-        this.quantity = quantity;
-        this.expireAt = expireAt;
-    }
-
-    public void delete() {
-        this.deletedAt = LocalDateTime.now();
+    public void update(InventoryUpdateRequest dto) {
+        this.quantity = dto.getQuantity();
+        this.expireAt = dto.getExpireAt();
     }
 
     public boolean isExpired() {

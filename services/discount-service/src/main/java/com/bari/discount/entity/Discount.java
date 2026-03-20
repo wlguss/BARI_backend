@@ -2,6 +2,8 @@ package com.bari.discount.entity;
 
 import java.time.LocalDateTime;
 
+import com.bari.common.entity.BaseTimeEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Discount {
+public class Discount extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +32,10 @@ public class Discount {
 
     private Integer originalPrice;
     private Integer discountPrice;
+    private Integer discountRate;
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime deletedAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     // 할인 수정
     public void update(Integer discountPrice) {
@@ -52,8 +47,4 @@ public class Discount {
         this.endAt = LocalDateTime.now();
     }
 
-    // soft delete
-    public void delete() {
-        this.deletedAt = LocalDateTime.now();
-    }
 }

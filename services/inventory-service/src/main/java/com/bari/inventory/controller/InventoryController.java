@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bari.inventory.dto.request.InventoryRequest;
+import com.bari.inventory.dto.request.InventoryUpdateRequest;
 import com.bari.inventory.service.InventoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,32 +36,27 @@ public class InventoryController {
     }
 
     // RQ-3002 재고 조회 (상품 기준)
-    @GetMapping
+    @GetMapping("/product/{productId}")
     public ResponseEntity<?> getInventories(
-            @RequestParam(required = false) Long productId) {
+            @PathVariable Long productId) {
 
-        if (productId != null) {
-            return ResponseEntity.ok(inventoryService.findByProduct(productId));
-        }
-
+        // if (productId != null) {
+        // return ResponseEntity.ok(inventoryService.findByProduct(productId));
+        // }
+        return ResponseEntity.ok(inventoryService.findByProduct(productId));
         // 전체 조회 (확장성 고려)
-        return ResponseEntity.ok(inventoryService.findAll());
+        // return ResponseEntity.ok(inventoryService.findAll());
     }
 
     // RQ-3003 재고 수정
-    @PutMapping("/{itemId}")
-    public ResponseEntity<?> updateInventory(
-            @PathVariable Long itemId,
-            @RequestParam Integer quantity,
-            @RequestParam String expireAt) {
-
-        inventoryService.update(
-                itemId,
-                quantity,
-                LocalDateTime.parse(expireAt));
-
+    @PutMapping("/{inventoryId}")
+    public ResponseEntity<?> updateInventory(@PathVariable Long inventoryId, @RequestBody InventoryUpdateRequest dto) {
+            
+        inventoryService.update(inventoryId, dto);
         return ResponseEntity.ok().build();
     }
+
+    
 
     // RQ-3004 재고 삭제 (soft delete)
     @DeleteMapping("/{itemId}")

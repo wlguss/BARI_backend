@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bari.inventory.dto.request.InventoryRequest;
+import com.bari.inventory.dto.request.InventoryUpdateRequest;
 import com.bari.inventory.dto.request.RequestDiscount;
 import com.bari.inventory.dto.response.InventoryResponse;
 import com.bari.inventory.entity.Inventory;
@@ -28,13 +29,19 @@ public class InventoryService {
         Inventory inventory = dto.toEntity();
         Inventory saved = inventoryRepository.save(inventory);
 
-        RequestDiscount discountDto = RequestDiscount.builder()
-                .inventoryId(saved.getId())
-                .originalPrice(dto.getOriginalPrice())
-                .discountPrice(dto.getDiscountPrice())
-                .build();
+        if (dto.getDiscounts() != null) {
+            for (RequestDiscount d : dto.getDiscounts()) {
+                RequestDiscount discountDto = RequestDiscount.builder()
+                        .inventoryId(saved.getId())
+                        .originalPrice(d.getOriginalPrice())
+                        .discountPrice(d.getDiscountPrice())
+                        .startAt(d.getStartAt())
+                        .endAt(d.getEndAt())
+                        .build();
 
-        discountClient.createDiscount(discountDto);
+                discountClient.createDiscount(discountDto);
+            }
+        }
 
         return InventoryResponse.fromEntity(saved);
     }
@@ -42,6 +49,7 @@ public class InventoryService {
     // 특정 상품 재고 조회
     @Transactional(readOnly = true)
     public List<InventoryResponse> findByProduct(Long productId) {
+        System.out.println("=== Service findByProduct parameter : " + productId);
         return inventoryRepository.findByProductIdAndDeletedAtIsNull(productId)
                 .stream()
                 .map(InventoryResponse::fromEntity)
@@ -58,11 +66,11 @@ public class InventoryService {
     }
 
     // 재고 수정
-    public void update(Long id, Integer quantity, LocalDateTime expireAt) {
+    public void update(Long id, InventoryUpdateRequest dto) {
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow();
 
-        inventory.update(quantity, expireAt);
+        inventory.update(dto);
     }
 
     // 재고 삭제 (soft delete)
@@ -70,7 +78,7 @@ public class InventoryService {
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow();
 
-        inventory.delete();
+        inventory.softDelete();
     }
 
     // 유통기한 만료 처리
