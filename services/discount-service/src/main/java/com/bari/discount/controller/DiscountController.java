@@ -33,7 +33,7 @@ public class DiscountController {
     }
 
     // 등록
-    @PostMapping("/internal")
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody DiscountRequest dto) {
         discountService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
