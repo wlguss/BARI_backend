@@ -1,5 +1,7 @@
 package com.bari.discount.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,24 +30,17 @@ public class DiscountService {
         return DiscountResponse.from(saved);
     }
 
-    // RQ-4002 할인 조회 (단건)
+    // RQ-4002 할인 조회
     @Transactional(readOnly = true)
-    public DiscountResponse get(Long discountId) {
+    public List<DiscountResponse> get(Long inventoryId) {
+        List<Discount> discounts = discountRepository.findByInventoryIdAndDeletedAtIsNull(inventoryId);
 
-        Discount discount = discountRepository
-                .findByIdAndDeletedAtIsNull(discountId)
-                .orElseThrow();
-
-        return DiscountResponse.from(discount);
+        return discounts.stream()
+                .map(DiscountResponse::from)
+                .toList();
     }
 
-    // 목록 조회 (페이징)
-    @Transactional(readOnly = true)
-    public Page<DiscountResponse> getAll(Pageable pageable) {
-
-        return discountRepository.findByDeletedAtIsNull(pageable)
-                .map(DiscountResponse::from);
-    }
+    
 
     // RQ-4003 수정
     public DiscountResponse update(Long id, DiscountRequest dto) {

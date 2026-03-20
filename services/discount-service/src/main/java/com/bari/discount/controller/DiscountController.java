@@ -26,21 +26,10 @@ public class DiscountController {
 
     private final DiscountService discountService;
 
-    // 목록 조회
-    @GetMapping
-    public ResponseEntity<?> getDiscounts(
-            @RequestParam int page,
-            @RequestParam int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        return ResponseEntity.ok(discountService.getAll(pageable));
-    }
-
     // 상세 조회
-    @GetMapping("/{discountId}")
-    public ResponseEntity<?> getDiscount(@PathVariable Long discountId) {
-        return ResponseEntity.ok(discountService.get(discountId));
+    @GetMapping("/{inventoryId}")
+    public ResponseEntity<?> getDiscount(@PathVariable Long inventoryId) {
+        return ResponseEntity.ok(discountService.get(inventoryId));
     }
 
     // 등록
