@@ -2,7 +2,9 @@ package com.bari.order.service;
 
 import com.bari.common.exception.BusinessException;
 import com.bari.order.client.ProductServiceClient;
+import com.bari.order.client.StoreServiceClient;
 import com.bari.order.dto.client.ProductInfo;
+import com.bari.order.dto.client.StoreInfo;
 import com.bari.order.dto.request.ReserveRequest;
 import com.bari.order.dto.request.UpdateOrderStatusRequest;
 import com.bari.order.dto.response.OrderResponse;
@@ -35,6 +37,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ProductServiceClient productServiceClient;
+    private final StoreServiceClient storeServiceClient;
 
     // ========== 고객 API ==========
 
@@ -73,8 +76,9 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse reserve(Long customerId, ReserveRequest request) {
-        // TODO: store-service 연동 - 매장 존재 여부 및 영업 상태 검증 (동기)
-        // store-service: GET /api/internal/stores/{storeId}
+        // 매장 존재 여부 검증 (store-service 동기 호출)
+        StoreInfo store = storeServiceClient.getStore(request.getStoreId());
+        log.debug("매장 검증 완료 - storeId: {}, name: {}", store.getId(), store.getStoreName());
 
         // 상품 존재 여부 검증 (product-service 동기 호출)
         ProductInfo product = productServiceClient.getProduct(request.getProductId());
@@ -134,9 +138,6 @@ public class OrderService {
      * @param pageable 페이지네이션
      */
     public Page<OrderResponse> getStoreOrders(Long ownerId, Pageable pageable) {
-        // TODO: store-service 연동 - ownerId로 소유 storeId 조회
-        // store-service: GET /api/internal/stores/owner/{ownerId}
-        // 예: Long storeId = storeServiceClient.getStoreIdByOwnerId(ownerId);
         Long storeId = fetchStoreIdByOwnerId(ownerId);
 
         return orderRepository.findByStoreId(storeId, pageable)
@@ -152,7 +153,6 @@ public class OrderService {
      * @throws BusinessException ORDER_FORBIDDEN — 본인 매장 주문이 아닌 경우
      */
     public OrderResponse getStoreOrder(Long ownerId, Long orderId) {
-        // TODO: store-service 연동 - ownerId로 소유 storeId 조회
         Long storeId = fetchStoreIdByOwnerId(ownerId);
 
         Order order = findOrderOrThrow(orderId);
@@ -173,7 +173,6 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse updateOrderStatus(Long ownerId, Long orderId, UpdateOrderStatusRequest request) {
-        // TODO: store-service 연동 - ownerId로 소유 storeId 조회
         Long storeId = fetchStoreIdByOwnerId(ownerId);
 
         Order order = findOrderOrThrow(orderId);
@@ -209,17 +208,12 @@ public class OrderService {
     }
 
     /**
-     * TODO: store-service 연동 후 구현.
      * store-service에서 해당 ownerId(사장님 userId)의 storeId를 조회합니다.
-     *
-     * 연동 방법: RestClient 또는 OpenFeign
-     * 호출 예시: GET /api/internal/stores/owner/{ownerId}
+     * store-service: GET /api/internal/stores/owner/{ownerId}
      */
     private Long fetchStoreIdByOwnerId(Long ownerId) {
-        // TODO: store-service RestClient/Feign 호출로 교체
-        // return storeServiceClient.getStoreIdByOwnerId(ownerId);
-        throw new UnsupportedOperationException(
-                "store-service 연동 전입니다. store-service 작업자에게 문의하세요. ownerId=" + ownerId
-        );
+        StoreInfo store = storeServiceClient.getStoreByOwnerId(ownerId);
+        log.debug("ownerId로 storeId 조회 완료 - ownerId: {}, storeId: {}", ownerId, store.getId());
+        return store.getId();
     }
 }
