@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.bari.inventory.entity.Inventory;
 
@@ -22,4 +25,15 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     List<Inventory> findByExpireAtBetweenAndDeletedAtIsNull(
             LocalDateTime start,
             LocalDateTime end);
+
+    @Modifying
+    @Query
+    ("""
+    UPDATE Inventory i
+    SET i.deletedAt = :now
+    WHERE i.expireAt < :now
+    AND i.deletedAt IS NULL
+    """)
+    int bulkSoftDelete(@Param("now") LocalDateTime now);
 }
+

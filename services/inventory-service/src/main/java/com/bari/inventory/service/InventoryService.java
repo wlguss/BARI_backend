@@ -3,6 +3,7 @@ package com.bari.inventory.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,11 +83,13 @@ public class InventoryService {
     }
 
     // 유통기한 만료 처리
+    @Scheduled(fixedRate = 60000)
+    @Transactional
     public void expireInventories() {
-        List<Inventory> inventories = inventoryRepository.findByExpireAtBeforeAndDeletedAtIsNull(LocalDateTime.now());
-
-        inventories.forEach(Inventory::isExpired);
+        int count = inventoryRepository.bulkSoftDelete(LocalDateTime.now());
     }
+    
+
 
     // 유통기한 임박 조회
     @Transactional(readOnly = true)
