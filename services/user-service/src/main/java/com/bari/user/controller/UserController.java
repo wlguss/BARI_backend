@@ -5,10 +5,12 @@ import com.bari.security.annotation.CurrentUserId;
 import com.bari.user.dto.response.UserResponse;
 import com.bari.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,8 +44,19 @@ public class UserController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getMe(@CurrentUserId Long userId) {
+    public ResponseEntity<ApiResponse<UserResponse>> getMe(@Parameter(hidden = true) @CurrentUserId Long userId) {
         UserResponse response = userService.getUser(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(
+            summary = "회원 탈퇴",
+            description = "현재 로그인한 사용자를 탈퇴 처리합니다. (soft delete)",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<Void>> withdraw(@Parameter(hidden = true) @CurrentUserId Long userId) {
+        userService.withdraw(userId);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }

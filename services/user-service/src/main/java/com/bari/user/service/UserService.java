@@ -170,8 +170,29 @@ public class UserService {
      * @throws BusinessException USER_NOT_FOUND — 사용자를 찾을 수 없음
      */
     public UserResponse getUser(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
         return UserResponse.from(user);
+    }
+
+    /**
+     * 회원 탈퇴.
+     * deletedAt을 현재 시간으로 설정(soft delete)하고 Redis의 Refresh Token을 삭제합니다.
+     *
+     * @param userId 사용자 ID
+     * @throws BusinessException USER_NOT_FOUND — 사용자를 찾을 수 없음
+     */
+    @Transactional
+    public void withdraw(Long userId) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        // soft delete 처리 (deletedAt 업데이트)
+        user.softDelete();
+
+        // Redis의 Refresh Token 삭제
+        redisTemplate.delete(REFRESH_TOKEN_PREFIX + userId);
+
+        log.info("회원 탈퇴 완료 - userId: {}", userId);
     }
 }

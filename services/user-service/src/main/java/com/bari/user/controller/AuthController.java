@@ -10,6 +10,8 @@ import com.bari.user.dto.response.UserResponse;
 import com.bari.user.exception.UserErrorCode;
 import com.bari.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,10 +69,14 @@ public class AuthController {
      * @param authorization Authorization 헤더 값
      * @return 새 Access Token, Refresh Token (200 OK)
      */
-    @Operation(summary = "토큰 갱신", description = "Refresh Token으로 새 Access Token을 발급받습니다.")
+    @Operation(
+            summary = "토큰 갱신",
+            description = "Refresh Token으로 새 Access Token을 발급받습니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refresh(
-            @RequestHeader("Authorization") String authorization) {
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authorization) {
 
         // "Bearer " 접두사 제거
         if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
@@ -90,9 +96,13 @@ public class AuthController {
      * @param userId 현재 로그인한 사용자 ID (자동 주입)
      * @return 200 OK
      */
-    @Operation(summary = "로그아웃", description = "Redis에서 Refresh Token을 삭제하여 로그아웃합니다.")
+    @Operation(
+            summary = "로그아웃",
+            description = "Redis에서 Refresh Token을 삭제하여 로그아웃합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @DeleteMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@CurrentUserId Long userId) {
+    public ResponseEntity<ApiResponse<Void>> logout(@Parameter(hidden = true) @CurrentUserId Long userId) {
         userService.logout(userId);
         return ResponseEntity.ok(ApiResponse.success());
     }
