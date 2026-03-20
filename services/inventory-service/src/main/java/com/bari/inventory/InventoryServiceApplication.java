@@ -2,6 +2,7 @@ package com.bari.inventory;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * 포트: 8084
  */
 @EnableJpaAuditing
+@EnableFeignClients
 @SpringBootApplication(scanBasePackages = "com.bari")
 public class InventoryServiceApplication {
 
