@@ -18,7 +18,7 @@ public class ReserveRequest {
 
     /**
      * 매장 ID.
-     * TODO: store-service 연동 시 해당 매장 존재 여부 검증 필요
+     * 매장 존재 여부 검증: OrderService.reserve() 에서 StoreServiceClient 통해 처리 완료
      */
     @NotNull(message = "매장 ID는 필수입니다.")
     private Long storeId;
