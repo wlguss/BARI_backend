@@ -16,6 +16,7 @@ import com.bari.inventory.entity.Inventory;
 import com.bari.inventory.repository.InventoryRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,11 +25,16 @@ import lombok.RequiredArgsConstructor;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    // private final DiscountFeignService discountClient;
+    private final ProductFeignService productFeignService;
 
     // 재고 등록
     public InventoryResponse create(InventoryRequest dto) {
 
+        try {
+            productFeignService.getProduct(dto.getProductId());
+        } catch (FeignException.NotFound e) {
+            throw new RuntimeException("상품이 존재하지 않음");
+        }
         Inventory inventory = dto.toEntity();
         Inventory saved = inventoryRepository.save(inventory);
 
@@ -91,7 +97,7 @@ public class InventoryService {
                 .toList();
     }
 
-    @KafkaListener(topics = "update-quantity-topic")
+    @KafkaListener(topics = "order.reserved")
     public void quantityConsumer(String message) {
 
         InventoryUpdateRequest request = null;
