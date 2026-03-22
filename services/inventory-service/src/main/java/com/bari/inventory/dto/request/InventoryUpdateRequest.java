@@ -10,7 +10,6 @@ import lombok.Getter;
 @Getter
 public class InventoryUpdateRequest {
 
-    private Long inventoryId;
     private Integer quantity;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

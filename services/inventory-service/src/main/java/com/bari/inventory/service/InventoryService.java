@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bari.inventory.dto.request.InventoryKafkaRequest;
 import com.bari.inventory.dto.request.InventoryRequest;
 import com.bari.inventory.dto.request.InventoryUpdateRequest;
 import com.bari.inventory.dto.request.RequestDiscount;
@@ -61,11 +62,14 @@ public class InventoryService {
     }
 
     // 재고 수정
-    public void update(InventoryUpdateRequest dto) {
-        Inventory inventory = inventoryRepository.findById(dto.getInventoryId())
-                .orElseThrow();
+    public void update(Long inventoryId, InventoryUpdateRequest dto) {
 
-        inventory.update(dto);
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new RuntimeException("재고 없음"));
+
+        inventory.update(
+                dto.getQuantity(),
+                dto.getExpireAt());
     }
 
     // 재고 삭제 (soft delete)
@@ -100,10 +104,10 @@ public class InventoryService {
     @KafkaListener(topics = "order.reserved")
     public void quantityConsumer(String message) {
 
-        InventoryUpdateRequest request = null;
+        InventoryKafkaRequest request = null;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            request = objectMapper.readValue(message, InventoryUpdateRequest.class);
+            request = objectMapper.readValue(message, InventoryKafkaRequest.class);
             Inventory inventory = inventoryRepository
                     .findById(request.getInventoryId())
                     .orElseThrow(() -> new RuntimeException("상품이 존재하지 않음"));

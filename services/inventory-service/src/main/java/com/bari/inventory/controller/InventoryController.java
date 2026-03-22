@@ -50,16 +50,17 @@ public class InventoryController {
 
     // RQ-3003 재고 수정
     @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateInventory(@RequestBody InventoryUpdateRequest dto) {
+    public ResponseEntity<?> updateInventory(@PathVariable Long inventoryId,
+            @RequestBody InventoryUpdateRequest dto) {
 
-        inventoryService.update(dto);
+        inventoryService.update(inventoryId, dto);
         return ResponseEntity.ok().build();
     }
 
     // RQ-3004 재고 삭제 (soft delete)
     @DeleteMapping("/{inventoryId}")
-    public ResponseEntity<?> deleteInventory(@PathVariable Long itemId) {
-        inventoryService.delete(itemId);
+    public ResponseEntity<?> deleteInventory(@PathVariable Long inventoryId) {
+        inventoryService.delete(inventoryId);
         return ResponseEntity.ok().build();
     }
 
