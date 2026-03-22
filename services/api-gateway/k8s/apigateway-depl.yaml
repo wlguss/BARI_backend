@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/api-gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: JWT_SECRET
+            - name: PRODUCT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: PRODUCT_SERVICE_HOST
+            - name: PRODUCT_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: PRODUCT_SERVICE_PORT
