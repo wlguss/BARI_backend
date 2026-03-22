@@ -51,9 +51,10 @@ public class StoreController {
     /**
      * 4. 매장 신규 등록
      */
-    @PostMapping 
+   @PostMapping 
     public ResponseEntity<Long> createStore(@RequestBody StoreRequestDto requestDto) {
-        Long storeId = storeService.createStore(requestDto);
+        
+        Long storeId = storeService.createStore(1L, requestDto); 
         return ResponseEntity.ok(storeId);
     }
 

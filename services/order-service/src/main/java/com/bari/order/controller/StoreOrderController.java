@@ -40,7 +40,7 @@ public class StoreOrderController {
             @CurrentUserId Long ownerId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             @ParameterObject Pageable pageable) {
-        return ApiResponse.success(orderService.getStoreOrders(ownerId, pageable));
+        return ResponseEntity.ok(ApiResponse.success(orderService.getStoreOrders(ownerId, pageable)));
     }
 
     @GetMapping("/{orderId}")
@@ -48,7 +48,7 @@ public class StoreOrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> getStoreOrder(
             @CurrentUserId Long ownerId,
             @PathVariable Long orderId) {
-        return ApiResponse.success(orderService.getStoreOrder(ownerId, orderId));
+        return ResponseEntity.ok(ApiResponse.success(orderService.getStoreOrder(ownerId, orderId)));
     }
 
     @PatchMapping("/{orderId}")
@@ -57,6 +57,6 @@ public class StoreOrderController {
             @CurrentUserId Long ownerId,
             @PathVariable Long orderId,
             @RequestBody @Valid UpdateOrderStatusRequest request) {
-        return ApiResponse.success(orderService.updateOrderStatus(ownerId, orderId, request));
+        return ResponseEntity.ok(ApiResponse.success(orderService.updateOrderStatus(ownerId, orderId, request)));
     }
 }

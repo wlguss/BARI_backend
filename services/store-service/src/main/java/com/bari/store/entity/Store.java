@@ -1,9 +1,9 @@
 package com.bari.store.entity;
 
+import com.bari.common.entity.BaseTimeEntity; 
+import com.bari.user.entity.User; 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "stores")
-@EntityListeners(AuditingEntityListener.class)
-public class Store {
+public class Store extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,13 +39,27 @@ public class Store {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "owner_id", nullable = false)
-    private Long ownerId;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner; 
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    // [추가] 소프트 삭제 메서드
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // [추가] 정보 업데이트 메서드 (서비스 로직에서 사용하기 좋음)
+    public void updateInfo(String name, String description, String address, String phone, 
+                          String businessHours, String category, String imageUrl) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
+        this.phone = phone;
+        this.businessHours = businessHours;
+        this.category = category;
+        this.imageUrl = imageUrl;
+    }
 }

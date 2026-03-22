@@ -18,15 +18,16 @@ public class ReserveRequest {
 
     /**
      * 매장 ID.
-     * TODO: store-service 연동 시 해당 매장 존재 여부 검증 필요
+     * 매장 존재 여부 검증: OrderService.reserve() 에서 StoreServiceClient 통해 처리 완료
      */
     @NotNull(message = "매장 ID는 필수입니다.")
     private Long storeId;
 
     /**
      * 상품 ID.
-     * TODO: product-service 연동 시 해당 상품 존재 여부 및 재고 검증 필요
-     * TODO: inventory-service 연동 시 예약 후 재고 차감 이벤트 발행 필요 (Kafka)
+     * 상품 존재 여부 검증: OrderService.reserve() 에서 ProductServiceClient 통해 처리 완료
+     * 재고 차감 이벤트: OrderService.reserve() 에서 Kafka "order.reserved" 토픽 발행 완료
+     * TODO: inventory-service 연동 - 재고 수량 확인 (동기) 미구현
      */
     @NotNull(message = "상품 ID는 필수입니다.")
     private Long productId;
