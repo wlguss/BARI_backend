@@ -12,17 +12,19 @@ import lombok.Getter;
 public class InventoryRequest {
     private Long productId;
     private Integer quantity;
+    private Integer price;
+    private String memo;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expireAt;
-
-    private Integer originalPrice;
 
     public Inventory toEntity() {
         return Inventory.builder()
                 .productId(productId)
                 .quantity(quantity)
+                .price(price)
                 .expireAt(expireAt)
+                .memo(memo)
                 .build();
     }
 }

@@ -69,7 +69,9 @@ public class InventoryService {
 
         inventory.update(
                 dto.getQuantity(),
-                dto.getExpireAt());
+                dto.getPrice(),
+                dto.getExpireAt(),
+                dto.getMemo());
     }
 
     // 재고 삭제 (soft delete)

@@ -30,12 +30,17 @@ public class Inventory extends BaseTimeEntity {
     private Long productId;
 
     private Integer quantity;
+    private Integer price;
 
     private LocalDateTime expireAt;
+    private String memo;
 
-    public void update(Integer quantity, LocalDateTime expireAt) {
+    public void update(Integer quantity, Integer price, LocalDateTime expireAt, String memo) {
+
         this.quantity = quantity;
+        this.price = price;
         this.expireAt = expireAt;
+        this.memo = memo;
     }
 
     public void updateQuantity(int quantity) {
