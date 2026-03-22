@@ -26,14 +26,15 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             LocalDateTime start,
             LocalDateTime end);
 
+    // 존재 유무
+    boolean existsByIdAndDeletedAtIsNull(Long id);
+
     @Modifying
-    @Query
-    ("""
-    UPDATE Inventory i
-    SET i.deletedAt = :now
-    WHERE i.expireAt < :now
-    AND i.deletedAt IS NULL
-    """)
+    @Query("""
+            UPDATE Inventory i
+            SET i.deletedAt = :now
+            WHERE i.expireAt < :now
+            AND i.deletedAt IS NULL
+            """)
     int bulkSoftDelete(@Param("now") LocalDateTime now);
 }
-

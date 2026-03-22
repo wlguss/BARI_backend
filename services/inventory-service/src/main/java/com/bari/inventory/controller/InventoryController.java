@@ -76,4 +76,11 @@ public class InventoryController {
     public ResponseEntity<?> getNearExpireInventories() {
         return ResponseEntity.ok(inventoryService.findNearExpire());
     }
+
+    // 존재 유무
+    @GetMapping("/exists/{inventoryId}")
+    public ResponseEntity<Boolean> exists(@PathVariable Long inventoryId) {
+        boolean exists = inventoryService.exists(inventoryId);
+        return ResponseEntity.ok(exists);
+    }
 }
