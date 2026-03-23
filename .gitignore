@@ -37,3 +37,4 @@ logs/
 
 # Docker volumes
 docker/data/
+
