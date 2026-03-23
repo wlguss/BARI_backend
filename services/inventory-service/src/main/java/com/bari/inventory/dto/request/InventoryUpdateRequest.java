@@ -12,6 +12,9 @@ public class InventoryUpdateRequest {
 
     private Integer quantity;
 
+    private Integer price;
+    private String memo;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expireAt;
 

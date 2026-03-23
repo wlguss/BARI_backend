@@ -1,82 +1,82 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventory-service
-  namespace: inventory-service
+  name: discount-service
+  namespace: discount-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: inventory-service
+      app: discount-service
   template:
     metadata:
       labels:
-        app: inventory-service
+        app: discount-service
     spec:
       containers:
-        - name: inventory-service
-          image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/inventory-service:latest
+        - name: discount-service
+          image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/discount-service:latest
           ports:
-            - containerPort: 8084
+            - containerPort: 8085
           env:
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
                 configMapKeyRef:
-                  name: inventory-service-config
+                  name: discount-service-config
                   key: SPRING_PROFILES_ACTIVE
 
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: inventory-service-config
+                  name: discount-service-config
                   key: DB_HOST
 
             - name: DB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: inventory-service-config
+                  name: discount-service-config
                   key: DB_PORT
 
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: inventory-service-config
+                  name: discount-service-config
                   key: DB_NAME
 
             - name: AWS_REGION
               valueFrom:
                 configMapKeyRef:
-                  name: inventory-service-config
+                  name: discount-service-config
                   key: AWS_REGION
 
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: discount-service-secret
                   key: DB_USERNAME
 
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: discount-service-secret
                   key: DB_PASSWORD
 
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: discount-service-secret
                   key: JWT_SECRET
 
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8084
+              port: 8085
             initialDelaySeconds: 30
             periodSeconds: 10
 
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8084
+              port: 8085
             initialDelaySeconds: 60
             periodSeconds: 20
