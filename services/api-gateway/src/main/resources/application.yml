@@ -48,6 +48,12 @@ spring:
           predicates:
             - Path=/api/orders/**,/api/store/orders/**
 
+        # store-service 라우팅
+        - id: store-service
+          uri: http://${STORE_SERVICE_HOST:localhost}:${STORE_SERVICE_PORT:8082}
+          predicates:
+            - Path=/api/stores/**    
+
 # JWT 시크릿 키 (32자 이상 필수)
 jwt:
   secret: ${JWT_SECRET:bari-super-secret-key-must-be-at-least-32-chars}
