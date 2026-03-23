@@ -13,13 +13,14 @@ spring:
     name: product-service
 
   datasource:
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}?useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:bari}
     password: ${DB_PASSWORD:bari1234}
     driver-class-name: org.mariadb.jdbc.Driver
-    # too-many connections 문제 해결
+    # too-many connections 문제 방지
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 3
+      minimum-idle: 2
 
   jpa:
     hibernate:
