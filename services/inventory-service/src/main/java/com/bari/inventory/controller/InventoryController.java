@@ -50,18 +50,17 @@ public class InventoryController {
 
     // RQ-3003 재고 수정
     @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateInventory(@PathVariable Long inventoryId, @RequestBody InventoryUpdateRequest dto) {
-            
+    public ResponseEntity<?> updateInventory(@PathVariable Long inventoryId,
+            @RequestBody InventoryUpdateRequest dto) {
+
         inventoryService.update(inventoryId, dto);
         return ResponseEntity.ok().build();
     }
 
-    
-
     // RQ-3004 재고 삭제 (soft delete)
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<?> deleteInventory(@PathVariable Long itemId) {
-        inventoryService.delete(itemId);
+    @DeleteMapping("/{inventoryId}")
+    public ResponseEntity<?> deleteInventory(@PathVariable Long inventoryId) {
+        inventoryService.delete(inventoryId);
         return ResponseEntity.ok().build();
     }
 
@@ -76,5 +75,12 @@ public class InventoryController {
     @GetMapping("/near-expire")
     public ResponseEntity<?> getNearExpireInventories() {
         return ResponseEntity.ok(inventoryService.findNearExpire());
+    }
+
+    // 존재 유무
+    @GetMapping("/exists/{inventoryId}")
+    public ResponseEntity<Boolean> exists(@PathVariable Long inventoryId) {
+        boolean exists = inventoryService.exists(inventoryId);
+        return ResponseEntity.ok(exists);
     }
 }

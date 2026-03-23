@@ -4,10 +4,9 @@ metadata:
   name: product-service
   namespace: product-service
 spec:
+  type: ClusterIP
   selector:
     app: product-service
   ports:
-    - protocol: TCP
-      port: 8083
+    - port: 8083
       targetPort: 8083
-  type: ClusterIP

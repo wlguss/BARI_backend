@@ -37,7 +37,7 @@ public class CustomerOrderController {
             @CurrentUserId Long customerId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             @ParameterObject Pageable pageable) {
-        return ApiResponse.success(orderService.getMyOrders(customerId, pageable));
+        return ResponseEntity.ok(ApiResponse.success(orderService.getMyOrders(customerId, pageable)));
     }
 
     @GetMapping("/{orderId}")
@@ -45,7 +45,7 @@ public class CustomerOrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> getMyOrder(
             @CurrentUserId Long customerId,
             @PathVariable Long orderId) {
-        return ApiResponse.success(orderService.getMyOrder(customerId, orderId));
+        return ResponseEntity.ok(ApiResponse.success(orderService.getMyOrder(customerId, orderId)));
     }
 
     @PostMapping("/reserve")
@@ -53,7 +53,7 @@ public class CustomerOrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> reserve(
             @CurrentUserId Long customerId,
             @RequestBody @Valid ReserveRequest request) {
-        return ApiResponse.created(orderService.reserve(customerId, request));
+        return ResponseEntity.status(201).body(ApiResponse.created(orderService.reserve(customerId, request)));
     }
 
     @PatchMapping("/{orderId}/cancel")
@@ -61,6 +61,6 @@ public class CustomerOrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(
             @CurrentUserId Long customerId,
             @PathVariable Long orderId) {
-        return ApiResponse.success(orderService.cancelOrder(customerId, orderId));
+        return ResponseEntity.ok(ApiResponse.success(orderService.cancelOrder(customerId, orderId)));
     }
 }

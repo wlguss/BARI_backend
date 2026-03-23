@@ -19,7 +19,9 @@ public enum OrderErrorCode implements ErrorCode {
     ORDER_FORBIDDEN(403, "해당 주문에 접근 권한이 없습니다."),
     ORDER_ALREADY_CANCELLED(400, "이미 취소된 주문입니다."),
     ORDER_CANNOT_CANCEL(400, "취소할 수 없는 주문 상태입니다. (PENDING 또는 CONFIRMED 상태만 취소 가능)"),
-    ORDER_CANNOT_UPDATE_STATUS(400, "변경할 수 없는 주문 상태입니다.");
+    ORDER_CANNOT_UPDATE_STATUS(400, "변경할 수 없는 주문 상태입니다."),
+    INVENTORY_NOT_ENOUGH(400, "재고가 부족합니다."),
+    INVENTORY_SERVICE_UNAVAILABLE(503, "재고 서비스에 연결할 수 없습니다.");
 
     private final int status;
     private final String message;
