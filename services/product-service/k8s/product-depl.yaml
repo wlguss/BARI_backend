@@ -19,70 +19,33 @@ spec:
           ports:
             - containerPort: 8083
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
-                  key: SPRING_PROFILES_ACTIVE
-
             - name: DB_HOST
               valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
+                secretKeyRef:
+                  name: product-service-secret
                   key: DB_HOST
-
             - name: DB_PORT
               valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
+                secretKeyRef:
+                  name: product-service-secret
                   key: DB_PORT
-
             - name: DB_NAME
               valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
+                secretKeyRef:
+                  name: product-service-secret
                   key: DB_NAME
-
-            - name: AWS_REGION
-              valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
-                  key: AWS_REGION
-
-            - name: S3_BUCKET
-              valueFrom:
-                configMapKeyRef:
-                  name: product-service-config
-                  key: S3_BUCKET
-
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: product-service-secret
                   key: DB_USERNAME
-
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: product-service-secret
                   key: DB_PASSWORD
-
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: product-service-secret
                   key: JWT_SECRET
-
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8083
-            initialDelaySeconds: 30
-            periodSeconds: 10
-
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8083
-            initialDelaySeconds: 60
-            periodSeconds: 20
