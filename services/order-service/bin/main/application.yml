@@ -1,51 +1,25 @@
 server:
-  port: ${SERVER_PORT:8086}
+  port: 8086
   shutdown: graceful
 
 spring:
   application:
     name: order-service
 
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
-
   datasource:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
     username: ${DB_USERNAME:bari}
     password: ${DB_PASSWORD:bari1234}
     driver-class-name: org.mariadb.jdbc.Driver
-    hikari:
-      maximum-pool-size: 3
-      minimum-idle: 1
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
-
-  # Kafka 설정
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
-
-# 내부 서비스 URL
-services:
-  product:
-    url: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8083}
-  store:
-    url: http://${STORE_SERVICE_HOST:localhost}:${STORE_SERVICE_PORT:8082}
-  inventory:
-    url: http://${INVENTORY_SERVICE_HOST:localhost}:${INVENTORY_SERVICE_PORT:8084}
 
 # JWT 설정 (32자 이상 시크릿 키 필수)
 jwt:

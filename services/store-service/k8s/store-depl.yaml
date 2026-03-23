@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: store-service
-  namespace: store  
+  namespace: bari
 spec:
   replicas: 2
   selector:
@@ -22,34 +22,33 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
             
-            
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: DB_HOST
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: DB_PORT
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: DB_NAME
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: DB_USERNAME
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: DB_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: store-service-secret
                   key: JWT_SECRET
