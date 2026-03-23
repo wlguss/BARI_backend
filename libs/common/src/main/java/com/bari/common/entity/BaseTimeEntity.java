@@ -46,4 +46,11 @@ public abstract class BaseTimeEntity {
     public boolean isDeleted() {
         return this.deletedAt != null;
     }
+
+    /**
+     * soft delete 복구 — deletedAt을 null로 초기화
+     */
+    public void restore() {
+        this.deletedAt = null;
+    }
 }

@@ -146,6 +146,15 @@ public class InventoryService {
                 .toList();
     }
 
+    // 여러 productId로 재고 목록 조회 (discount-service 내부 호출용)
+    @Transactional(readOnly = true)
+    public List<InventoryResponse> findByProductIds(List<Long> productIds) {
+        return inventoryRepository.findByProductIdInAndDeletedAtIsNull(productIds)
+                .stream()
+                .map(InventoryResponse::fromEntity)
+                .toList();
+    }
+
     public boolean exists(Long inventoryId) {
         boolean exists = inventoryRepository.existsByIdAndDeletedAtIsNull(inventoryId);
         return exists;

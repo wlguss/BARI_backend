@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 서비스 간 내부 통신 전용 컨트롤러.
@@ -35,5 +38,18 @@ public class InternalProductController {
     @Operation(summary = "[내부] 상품 조회", description = "order-service 등 내부 서비스에서 상품 존재 여부 확인용")
     public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getById(productId));
+    }
+
+    /**
+     * 여러 매장의 상품 목록 조회 (내부용).
+     * discount-service에서 찜한 매장의 할인 임박 상품 조회 시 사용합니다.
+     *
+     * @param storeIds 매장 ID 목록
+     * @return 상품 목록
+     */
+    @GetMapping("/by-stores")
+    @Operation(summary = "[내부] 매장별 상품 목록 조회", description = "discount-service에서 찜한 매장 할인 임박 상품 조회용")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByStoreIds(@RequestParam List<Long> storeIds) {
+        return ResponseEntity.ok(productService.getByStoreIds(storeIds));
     }
 }

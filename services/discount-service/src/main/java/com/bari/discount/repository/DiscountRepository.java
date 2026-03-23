@@ -1,5 +1,6 @@
 package com.bari.discount.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,8 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
     Optional<Discount> findByIdAndDeletedAtIsNull(Long id);
 
     List<Discount> findByInventoryIdAndDeletedAtIsNull(Long inventoryId);
+
+    // 찜한 매장 할인 임박 상품 조회 (endAt이 now~tomorrow 사이)
+    List<Discount> findByInventoryIdInAndEndAtBetweenAndDeletedAtIsNull(
+            List<Long> inventoryIds, LocalDateTime start, LocalDateTime end);
 }

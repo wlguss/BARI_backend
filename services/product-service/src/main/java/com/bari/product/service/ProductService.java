@@ -107,6 +107,14 @@ public class ProductService {
         }
     }
 
+    // 여러 storeId로 한 번에 상품 조회 (discount-service 내부 호출용)
+    public List<ProductResponseDTO> getByStoreIds(List<Long> storeIds) {
+        return productRepository.findAllByStoreIdInAndDeletedAtIsNull(storeIds)
+                .stream()
+                .map(ProductResponseDTO::from)
+                .toList();
+    }
+
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
     }
