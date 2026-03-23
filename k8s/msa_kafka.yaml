@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka
-  namespace: kafka
+  namespace: inventory-service
 spec:
   replicas: 1
   selector:
@@ -21,9 +21,9 @@ spec:
             - containerPort: 9092
           env:
             - name: KAFKA_ZOOKEEPER_CONNECT
-              value: zookeeper.kafka.svc.cluster.local:2181
+              value: zookeeper:2181
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: INSIDE://kafka.kafka.svc.cluster.local:9092
+              value: INSIDE://kafka:9092
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
               value: INSIDE:PLAINTEXT
             - name: KAFKA_LISTENERS
@@ -38,7 +38,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka
-  namespace: kafka
 spec:
   type: ClusterIP
   selector:
