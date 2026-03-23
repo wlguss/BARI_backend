@@ -1,9 +1,12 @@
 package com.bari.order.service;
 
 import com.bari.common.exception.BusinessException;
+import com.bari.order.client.InventoryServiceClient;
 import com.bari.order.client.ProductServiceClient;
 import com.bari.order.client.StoreServiceClient;
+import com.bari.order.dto.client.InventoryInfo;
 import com.bari.order.dto.client.ProductInfo;
+import java.util.List;
 import com.bari.order.dto.client.StoreInfo;
 import com.bari.order.dto.request.ReserveRequest;
 import com.bari.order.dto.request.UpdateOrderStatusRequest;
@@ -38,6 +41,7 @@ public class OrderService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ProductServiceClient productServiceClient;
     private final StoreServiceClient storeServiceClient;
+    private final InventoryServiceClient inventoryServiceClient;
 
     // ========== 고객 API ==========
 
@@ -84,9 +88,14 @@ public class OrderService {
         ProductInfo product = productServiceClient.getProduct(request.getProductId());
         log.debug("상품 검증 완료 - productId: {}, name: {}", product.getId(), product.getName());
 
-        // TODO: inventory-service 연동 - 재고 수량 확인 (동기)
-        // inventory-service: GET /api/internal/inventory/{productId}
-        // 재고 부족 시 예외 처리 필요 (예: INVENTORY_NOT_ENOUGH)
+        // 재고 수량 확인 (inventory-service 동기 호출)
+        List<InventoryInfo> inventories = inventoryServiceClient.getInventoriesByProduct(request.getProductId(), customerId);
+        int totalStock = inventories.stream().mapToInt(InventoryInfo::getQuantity).sum();
+        if (totalStock < request.getQuantity()) {
+            log.warn("재고 부족 - productId: {}, 요청 수량: {}, 현재 재고: {}", request.getProductId(), request.getQuantity(), totalStock);
+            throw new BusinessException(OrderErrorCode.INVENTORY_NOT_ENOUGH);
+        }
+        log.debug("재고 확인 완료 - productId: {}, 요청 수량: {}, 현재 재고: {}", request.getProductId(), request.getQuantity(), totalStock);
 
         Order order = request.toEntity(customerId);
         Order saved = orderRepository.save(order);
