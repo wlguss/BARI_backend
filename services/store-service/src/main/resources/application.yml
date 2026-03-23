@@ -48,3 +48,8 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+    
