@@ -64,7 +64,9 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
      */
     private static final List<String> PUBLIC_GET_PATHS = List.of(
             "/api/items",
-            "/api/items/**");
+            "/api/items/**"
+            ,"/api/products",  // 테스트용 (전체 테스트시 지울것)
+             "/api/products/**");
 
     @PostConstruct
     public void init() {
