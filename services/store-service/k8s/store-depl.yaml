@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-service
+  namespace: bari
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: store-service
+  template:
+    metadata:
+      labels:
+        app: store-service
+    spec:
+      containers:
+        - name: store-service
+          image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/store-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: DB_NAME
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: store-service-secret
+                  key: JWT_SECRET
