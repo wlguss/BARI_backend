@@ -4,7 +4,7 @@ metadata:
   name: discount-service
   namespace: discount-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: discount-service
@@ -19,64 +19,57 @@ spec:
           ports:
             - containerPort: 8085
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: discount-service-config
-                  key: SPRING_PROFILES_ACTIVE
-
+            - name: SERVER_PORT
+              value: "8085"
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx256m"
             - name: DB_HOST
               valueFrom:
-                configMapKeyRef:
-                  name: discount-service-config
+                secretKeyRef:
+                  name: bari-app-secrets
                   key: DB_HOST
-
             - name: DB_PORT
               valueFrom:
-                configMapKeyRef:
-                  name: discount-service-config
+                secretKeyRef:
+                  name: bari-app-secrets
                   key: DB_PORT
-
             - name: DB_NAME
               valueFrom:
-                configMapKeyRef:
-                  name: discount-service-config
+                secretKeyRef:
+                  name: bari-app-secrets
                   key: DB_NAME
-
-            - name: AWS_REGION
-              valueFrom:
-                configMapKeyRef:
-                  name: discount-service-config
-                  key: AWS_REGION
-
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: DB_USERNAME
-
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: DB_PASSWORD
-
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: JWT_SECRET
-
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8085
-            initialDelaySeconds: 30
-            periodSeconds: 10
-
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8085
-            initialDelaySeconds: 60
-            periodSeconds: 20
+            - name: PRODUCT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: discount-service-secret
+                  key: PRODUCT_SERVICE_HOST
+            - name: PRODUCT_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: discount-service-secret
+                  key: PRODUCT_SERVICE_PORT
+            - name: INVENTORY_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: discount-service-secret
+                  key: INVENTORY_SERVICE_HOST
+            - name: INVENTORY_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: discount-service-secret
+                  key: INVENTORY_SERVICE_PORT
