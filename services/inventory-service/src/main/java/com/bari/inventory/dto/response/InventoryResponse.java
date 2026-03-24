@@ -6,9 +6,11 @@ import com.bari.inventory.entity.Inventory;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 public class InventoryResponse {
     private Long id;
     private Long productId;

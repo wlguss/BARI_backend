@@ -4,7 +4,7 @@ metadata:
   name: inventory-service
   namespace: inventory-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: inventory-service
@@ -18,8 +18,42 @@ spec:
           image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/inventory-service:latest
           ports:
             - containerPort: 8084
-          envFrom:
-            - secretRef:
-                name: bari-app-secrets
+          env:
+            - name: JAVA_OPTS
+              value: -Xms128m -Xmx256m
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bari-app-secrets
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: bari-app-secrets
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bari-app-secrets
+                  key: DB_NAME
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bari-app-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bari-app-secrets
+                  key: DB_PASSWORD
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-service-secret
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: PRODUCT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: inventory-service-secret
+                  key: PRODUCT_SERVICE_HOST
+      
