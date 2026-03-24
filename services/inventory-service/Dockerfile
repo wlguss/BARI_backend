@@ -20,6 +20,6 @@ WORKDIR /app
 
 COPY --from=builder /app/services/inventory-service/build/libs/*.jar app.jar
 
-EXPOSE 8083
+EXPOSE 8084
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
