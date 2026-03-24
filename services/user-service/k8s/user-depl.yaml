@@ -4,7 +4,7 @@ metadata:
   name: user-service
   namespace: user-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: user-service
@@ -22,6 +22,9 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
+
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx256m"
 
             - name: DB_HOST
               valueFrom:
