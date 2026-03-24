@@ -32,7 +32,7 @@ public class StoreResponseDto {
                 .businessHours(store.getBusinessHours())
                 .category(store.getCategory())
                 .imageUrl(store.getImageUrl())
-                .ownerId(store.getOwner() != null ? store.getOwner().getId() : null)
+                .ownerId(store.getOwnerId())
                 .build();
     }
 }

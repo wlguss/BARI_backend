@@ -1,14 +1,12 @@
 package com.bari.store.entity;
 
-import com.bari.common.entity.BaseTimeEntity; 
-import com.bari.user.entity.User; 
+import com.bari.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter 
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,9 +37,8 @@ public class Store extends BaseTimeEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner; 
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

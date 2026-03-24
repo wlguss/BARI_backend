@@ -1,5 +1,6 @@
 package com.bari.store.controller;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.store.dto.response.StoreResponseDto;
 import com.bari.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,26 +28,20 @@ public class InternalStoreController {
     /**
      * 매장 단건 조회 (내부용).
      * order-service에서 픽업 예약 시 매장 존재 여부 검증에 사용합니다.
-     *
-     * @param storeId 매장 ID
-     * @return 매장 정보
      */
     @GetMapping("/{storeId}")
     @Operation(summary = "[내부] 매장 조회", description = "order-service 등 내부 서비스에서 매장 존재 여부 확인용")
-    public ResponseEntity<StoreResponseDto> getStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(storeService.getStoreForInternal(storeId));
+    public ResponseEntity<ApiResponse<StoreResponseDto>> getStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreForInternal(storeId)));
     }
 
     /**
      * ownerId로 매장 조회 (내부용).
      * order-service에서 매장 사장님의 storeId 조회 시 사용합니다.
-     *
-     * @param ownerId 사장님 userId
-     * @return 매장 정보
      */
     @GetMapping("/owner/{ownerId}")
     @Operation(summary = "[내부] ownerId로 매장 조회", description = "order-service에서 사장님 userId로 storeId 조회용")
-    public ResponseEntity<StoreResponseDto> getStoreByOwnerId(@PathVariable Long ownerId) {
-        return ResponseEntity.ok(storeService.getStoreByOwnerId(ownerId));
+    public ResponseEntity<ApiResponse<StoreResponseDto>> getStoreByOwnerId(@PathVariable Long ownerId) {
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreByOwnerId(ownerId)));
     }
 }
