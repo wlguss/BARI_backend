@@ -4,7 +4,7 @@ metadata:
   name: product-service
   namespace: product-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: product-service
@@ -21,3 +21,6 @@ spec:
           envFrom:
             - secretRef:
                 name: bari-app-secrets
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx256m"
