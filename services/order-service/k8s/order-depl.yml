@@ -49,7 +49,7 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: order-service-secret
+                  name: bari-app-secrets
                   key: JWT_SECRET
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
