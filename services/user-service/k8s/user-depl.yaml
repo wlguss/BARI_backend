@@ -59,17 +59,11 @@ spec:
                   name: bari-app-secrets
                   key: JWT_SECRET
 
-            # TODO: ElastiCache 생성 후 bari-app-secrets에 REDIS_HOST, REDIS_PORT 추가 필요
-            # - name: REDIS_HOST
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: bari-app-secrets
-            #       key: REDIS_HOST
-            # - name: REDIS_PORT
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: bari-app-secrets
-            #       key: REDIS_PORT
+            - name: REDIS_HOST
+              value: "redis"
+
+            - name: REDIS_PORT
+              value: "6379"
 
           readinessProbe:
             httpGet:

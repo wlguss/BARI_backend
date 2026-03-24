@@ -22,7 +22,7 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: gateway-secret
+                  name: bari-app-secrets
                   key: JWT_SECRET
             - name: PRODUCT_SERVICE_HOST
               valueFrom:
@@ -34,3 +34,14 @@ spec:
                 secretKeyRef:
                   name: gateway-secret
                   key: PRODUCT_SERVICE_PORT
+
+            - name: INVENTORY_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: INVENTORY_SERVICE_HOST
+            - name: INVENTORY_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: INVENTORY_SERVICE_PORT

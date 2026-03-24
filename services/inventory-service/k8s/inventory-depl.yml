@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: inventory-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      containers:
+        - name: inventory-service
+          image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/inventory-service:latest
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - secretRef:
+                name: bari-app-secrets
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
