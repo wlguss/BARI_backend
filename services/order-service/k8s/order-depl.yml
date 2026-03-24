@@ -17,10 +17,10 @@ spec:
         - name: order-service
           image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/order-service:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8086
           env:
             - name: SERVER_PORT
-              value: "8080"
+              value: "8086"
             - name: JAVA_OPTS
               value: "-Xms128m -Xmx256m"
             - name: DB_HOST
@@ -91,12 +91,12 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8080
+              port: 8086
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 8086
             initialDelaySeconds: 60
             periodSeconds: 15
