@@ -4,7 +4,7 @@ metadata:
   name: api-gateway
   namespace: gateway
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -34,3 +34,5 @@ spec:
                 secretKeyRef:
                   name: gateway-secret
                   key: PRODUCT_SERVICE_PORT
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx256m"
