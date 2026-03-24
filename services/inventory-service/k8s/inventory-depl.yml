@@ -22,27 +22,27 @@ spec:
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: DB_HOST
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: DB_PORT
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: DB_NAME
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: DB_USERNAME
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: DB_PASSWORD
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: kafka:9092
