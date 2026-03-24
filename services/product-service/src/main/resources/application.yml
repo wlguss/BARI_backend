@@ -20,7 +20,9 @@ spring:
     # too-many connections 문제 방지
     hikari:
       maximum-pool-size: 3
-      minimum-idle: 2
+      minimum-idle: 1
+      idle-timeout: 30000     
+      max-lifetime: 600000       
 
   jpa:
     hibernate:
@@ -62,7 +64,7 @@ cloud:
   aws:
     region: ${AWS_REGION:ap-northeast-2}
     credentials:
-     access-key: ${AWS_ACCESS_KEY}
-     secret-key: ${AWS_SECRET_KEY}
+     access-key: ${AWS_ACCESS_KEY:}
+     secret-key: ${AWS_SECRET_KEY:}
     s3:
       bucket: ${AWS_S3_BUCKET:bari-product-images}

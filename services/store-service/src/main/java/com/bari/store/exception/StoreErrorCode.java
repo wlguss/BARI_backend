@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 public enum StoreErrorCode implements ErrorCode {
 
     STORE_NOT_FOUND(404, "STORE_NOT_FOUND", "매장을 찾을 수 없습니다."),
+    STORE_ALREADY_DELETED(400, "STORE_ALREADY_DELETED", "이미 삭제된 매장입니다."),
     DISCOUNT_SERVICE_UNAVAILABLE(503, "DISCOUNT_SERVICE_UNAVAILABLE", "할인 서비스에 연결할 수 없습니다.");
 
     private final int status;

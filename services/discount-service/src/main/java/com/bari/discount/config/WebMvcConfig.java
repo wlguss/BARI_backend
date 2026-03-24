@@ -1,4 +1,4 @@
-package com.bari.user.config;
+package com.bari.discount.config;
 
 import com.bari.security.annotation.CurrentUserIdArgumentResolver;
 import org.springframework.context.annotation.Configuration;
@@ -7,11 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
-/**
- * user-service Web MVC 설정.
- * @CurrentUserId 어노테이션 처리를 위한 ArgumentResolver를 등록합니다.
- * CORS는 api-gateway의 globalcors에서 일괄 처리합니다.
- */
+// CORS는 api-gateway의 globalcors에서 일괄 처리합니다.
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

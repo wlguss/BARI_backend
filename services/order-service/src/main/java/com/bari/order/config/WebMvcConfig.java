@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * WebMVC 설정.
  * @CurrentUserId 어노테이션이 컨트롤러 파라미터에서 동작하도록 ArgumentResolver를 등록합니다.
+ * CORS는 api-gateway의 globalcors에서 일괄 처리합니다.
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
