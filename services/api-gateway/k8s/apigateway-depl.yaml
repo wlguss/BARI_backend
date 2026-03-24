@@ -34,5 +34,14 @@ spec:
                 secretKeyRef:
                   name: gateway-secret
                   key: PRODUCT_SERVICE_PORT
-            - name: JAVA_OPTS
-              value: "-Xms128m -Xmx256m"
+
+            - name: INVENTORY_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: INVENTORY_SERVICE_HOST
+            - name: INVENTORY_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: INVENTORY_SERVICE_PORT

@@ -1,8 +1,12 @@
 package com.bari.store.controller;
 
+import com.bari.common.response.ApiResponse;
+import com.bari.security.annotation.CurrentUserId;
 import com.bari.store.dto.request.StoreRequestDto;
 import com.bari.store.dto.response.StoreResponseDto;
 import com.bari.store.service.StoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/stores")
 @RequiredArgsConstructor
+@Tag(name = "Store API", description = "매장 관리")
 public class StoreController {
 
     private final StoreService storeService;
@@ -20,51 +25,51 @@ public class StoreController {
      * 1. 매장 전체 목록 조회
      */
     @GetMapping
-    public ResponseEntity<List<StoreResponseDto>> getAllStores() {
-        return ResponseEntity.ok(storeService.getAllStores());
+    @Operation(summary = "매장 전체 목록 조회")
+    public ResponseEntity<ApiResponse<List<StoreResponseDto>>> getAllStores() {
+        return ResponseEntity.ok(ApiResponse.success(storeService.getAllStores()));
     }
 
     /**
-     * 2. 특정 매장 상세 조회 (RQ-1003)
+     * 2. 특정 매장 상세 조회
      */
     @GetMapping("/{id}")
-    public ResponseEntity<StoreResponseDto> getStoreDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(storeService.getStoreDetail(id));
+    @Operation(summary = "매장 상세 조회")
+    public ResponseEntity<ApiResponse<StoreResponseDto>> getStoreDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoreDetail(id)));
     }
 
     /**
-     * 3. 매장 정보 수정 (RQ-1004)
+     * 3. 매장 신규 등록
+     */
+    @PostMapping
+    @Operation(summary = "매장 등록")
+    public ResponseEntity<ApiResponse<Long>> createStore(
+            @CurrentUserId Long userId,
+            @RequestBody StoreRequestDto requestDto) {
+        Long storeId = storeService.createStore(userId, requestDto);
+        return ResponseEntity.status(201).body(ApiResponse.created(storeId));
+    }
+
+    /**
+     * 4. 매장 정보 수정
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStore(
-            @PathVariable("id") Long id, 
-            @RequestBody StoreRequestDto requestDto) { 
-        
-       
-        System.out.println("수정 요청 ID: " + id);
-        System.out.println("수정 내용: " + requestDto.toString());
-        
+    @Operation(summary = "매장 정보 수정")
+    public ResponseEntity<ApiResponse<Void>> updateStore(
+            @PathVariable Long id,
+            @RequestBody StoreRequestDto requestDto) {
         storeService.updateStore(id, requestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     /**
-     * 4. 매장 신규 등록
-     */
-   @PostMapping 
-    public ResponseEntity<Long> createStore(@RequestBody StoreRequestDto requestDto) {
-        
-        Long storeId = storeService.createStore(1L, requestDto); 
-        return ResponseEntity.ok(storeId);
-    }
-
-    /**
-     * 5. 매장 삭제 
-     * 실제 데이터를 지우지 않고 deleted_at 컬럼을 업데이트합니다.
+     * 5. 매장 삭제 (Soft Delete)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStore(@PathVariable Long id) {
+    @Operation(summary = "매장 삭제")
+    public ResponseEntity<ApiResponse<Void>> deleteStore(@PathVariable Long id) {
         storeService.deleteStore(id);
-        return ResponseEntity.noContent().build(); // 204 No Content 반환
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }
