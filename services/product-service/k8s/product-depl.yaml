@@ -18,34 +18,6 @@ spec:
           image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/product-service:latest
           ports:
             - containerPort: 8083
-          env:
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: DB_HOST
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: DB_PORT
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: DB_NAME
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: DB_USERNAME
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: DB_PASSWORD
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: product-service-secret
-                  key: JWT_SECRET
+          envFrom:
+            - secretRef:
+                name: bari-app-secrets
