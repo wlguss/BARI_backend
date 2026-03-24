@@ -75,7 +75,7 @@ CREATE TABLE orders (
     status VARCHAR(20) NOT NULL DEFAULT 'RESERVED',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
-    CONSTRAINT chk_orders_status CHECK (status IN ('RESERVED','CANCELED','COMPLETED','NO_SHOW')),
+    CONSTRAINT chk_orders_status CHECK (status IN ('PENDING','CONFIRMED','READY','COMPLETED','CANCELLED')),
     CONSTRAINT fk_order_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_order_store FOREIGN KEY (store_id) REFERENCES stores(id),
     CONSTRAINT fk_order_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
