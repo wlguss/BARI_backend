@@ -1,25 +1,44 @@
 server:
   port: 8084
   shutdown: graceful
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   application:
     name: inventory-service
 
   datasource:
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}?useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:bari}
     password: ${DB_PASSWORD:bari1234}
     driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
+  # Kafka 설정
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+
+    consumer:
+      group-id: inventory-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    listener:
+      missing-topics-fatal: false
 
 # JWT 설정 (32자 이상 시크릿 키 필수)
 jwt:
@@ -42,3 +61,6 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+
+

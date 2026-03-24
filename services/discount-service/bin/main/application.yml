@@ -14,12 +14,19 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
+
+# 내부 서비스 URL
+services:
+  product:
+    url: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8083}
+  inventory:
+    url: http://${INVENTORY_SERVICE_HOST:localhost}:${INVENTORY_SERVICE_PORT:8084}
 
 # JWT 설정 (32자 이상 시크릿 키 필수)
 jwt:

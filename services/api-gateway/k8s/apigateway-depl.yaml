@@ -22,7 +22,7 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: bari-app-secrets
+                  name: gateway-secret
                   key: JWT_SECRET
             - name: PRODUCT_SERVICE_HOST
               valueFrom:
