@@ -45,3 +45,14 @@ spec:
                 secretKeyRef:
                   name: gateway-secret
                   key: INVENTORY_SERVICE_PORT
+
+            - name: USER_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: USER_SERVICE_HOST
+            - name: USER_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: USER_SERVICE_PORT
