@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: store-service
-  namespace: bari
+  namespace: store-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: store-service
@@ -21,7 +21,10 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
-            
+              
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx256m"  
+
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:

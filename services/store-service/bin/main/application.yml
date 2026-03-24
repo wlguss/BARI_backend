@@ -6,12 +6,6 @@ spring:
   application:
     name: store-service
     
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration  
-
-
   datasource:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
     username: ${DB_USERNAME:bari}
@@ -26,6 +20,11 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
+
+# 내부 서비스 URL
+services:
+  discount:
+    url: http://${DISCOUNT_SERVICE_HOST:localhost}:${DISCOUNT_SERVICE_PORT:8085}
 
 # JWT 설정 (32자 이상 시크릿 키 필수)
 jwt:
