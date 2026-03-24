@@ -17,7 +17,7 @@ spring:
     password: ${DB_PASSWORD:bari1234}
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
-      maximum-pool-size: 3
+      maximum-pool-size: 2
       minimum-idle: 1
 
   jpa:
@@ -30,7 +30,7 @@ spring:
         dialect: org.hibernate.dialect.MariaDBDialect
   # Kafka 설정
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
     consumer:
       group-id: inventory-group
@@ -61,6 +61,10 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+services:
+  product:
+    url: http://${PRODUCT_SERVICE_HOST:localhost}:${PRODUCT_SERVICE_PORT:8083}
 
 
 

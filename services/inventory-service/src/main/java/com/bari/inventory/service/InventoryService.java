@@ -41,10 +41,14 @@ public class InventoryService {
         }
 
         try {
+            System.out.println("==== Feign 호출 시작: productId=" + dto.getProductId());
             productFeignService.getProduct(dto.getProductId());
+            System.out.println("==== Feign 호출 성공");
         } catch (FeignException.NotFound e) {
+            e.printStackTrace();
             throw new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND);
         } catch (FeignException e) {
+            e.printStackTrace();
             throw new BusinessException(InventoryErrorCode.INVENTORY_CREATE_FAILED);
         }
 
@@ -71,10 +75,13 @@ public class InventoryService {
     // 특정 상품 재고 조회
     @Transactional(readOnly = true)
     public List<InventoryResponse> findByProduct(Long productId) {
-        return inventoryRepository.findByProductIdAndDeletedAtIsNull(productId)
+        List<InventoryResponse> response = inventoryRepository.findByProductIdAndDeletedAtIsNull(productId)
                 .stream()
                 .map(InventoryResponse::fromEntity)
                 .toList();
+
+        System.out.println("==== inven service : " + response);
+        return response;
     }
 
     // 전체 조회

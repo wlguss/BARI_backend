@@ -43,6 +43,7 @@ public class InventoryController {
         // if (productId != null) {
         // return ResponseEntity.ok(inventoryService.findByProduct(productId));
         // }
+        System.out.println("==== Controller called with productId: " + productId);
         return ResponseEntity.ok(inventoryService.findByProduct(productId));
         // 전체 조회 (확장성 고려)
         // return ResponseEntity.ok(inventoryService.findAll());
