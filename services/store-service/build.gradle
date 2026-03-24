@@ -5,13 +5,7 @@ plugins {
 }
 
 dependencies {
-    
     implementation project(':libs:security')
-    
-    
-    implementation project(':services:user-service') 
-    
-    
     implementation project(':libs:common')
 
     implementation libs.spring.boot.web

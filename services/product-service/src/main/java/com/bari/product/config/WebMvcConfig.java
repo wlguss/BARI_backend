@@ -10,6 +10,7 @@ import com.bari.security.annotation.CurrentUserIdArgumentResolver;
 
 import lombok.RequiredArgsConstructor;
 
+// CORS는 api-gateway의 globalcors에서 일괄 처리합니다.
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
