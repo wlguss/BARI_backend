@@ -7,7 +7,7 @@ spring:
     name: store-service
     
   datasource:
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bari}?useUnicode=true&characterEncoding=UTF-8
     username: ${DB_USERNAME:bari}
     password: ${DB_PASSWORD:bari1234}
     driver-class-name: org.mariadb.jdbc.Driver
