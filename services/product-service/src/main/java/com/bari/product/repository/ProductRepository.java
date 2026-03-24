@@ -19,4 +19,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>{
     List<ProductEntity> findAllByNameContainingIgnoreCaseAndDeletedAtIsNullOrderByIdDesc(String name);
 
     List<ProductEntity> findAllByStoreIdAndNameContainingIgnoreCaseAndDeletedAtIsNullOrderByIdDesc(Long storeId, String name);
+
+    // 여러 storeId로 한 번에 조회 (찜한 매장 할인 임박 상품용)
+    List<ProductEntity> findAllByStoreIdInAndDeletedAtIsNull(List<Long> storeIds);
 }
