@@ -20,7 +20,9 @@ spring:
     # too-many connections 문제 방지
     hikari:
       maximum-pool-size: 3
-      minimum-idle: 2
+      minimum-idle: 1
+      idle-timeout: 30000     
+      max-lifetime: 600000       
 
   jpa:
     hibernate:
