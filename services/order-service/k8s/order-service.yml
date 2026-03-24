@@ -8,5 +8,5 @@ spec:
   selector:
     app: order-service
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8086
+      targetPort: 8086
