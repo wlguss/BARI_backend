@@ -6,8 +6,9 @@ import com.bari.order.client.ProductServiceClient;
 import com.bari.order.client.StoreServiceClient;
 import com.bari.order.dto.client.InventoryInfo;
 import com.bari.order.dto.client.ProductInfo;
-import java.util.List;
 import com.bari.order.dto.client.StoreInfo;
+
+import java.util.List;
 import com.bari.order.dto.request.ReserveRequest;
 import com.bari.order.dto.request.UpdateOrderStatusRequest;
 import com.bari.order.dto.response.OrderResponse;
@@ -195,6 +196,24 @@ public class OrderService {
         order.updateStatus(request.getStatus());
         log.info("주문 상태 변경 완료 - orderId: {}, status: {}, storeId: {}", orderId, request.getStatus(), storeId);
         return OrderResponse.from(order);
+    }
+
+    /**
+     * 매장 기준 전체 주문 목록 조회 (storeId 직접 지정).
+     * status가 null이면 전체, 값이 있으면 해당 status만 필터링합니다.
+     *
+     * @param storeId 매장 ID
+     * @param status  주문 상태 필터 (null 허용)
+     */
+    public List<OrderResponse> getOrdersByStoreId(Long storeId, OrderStatus status) {
+        if (status != null) {
+            return orderRepository.findAllByStoreIdAndStatus(storeId, status).stream()
+                    .map(OrderResponse::from)
+                    .toList();
+        }
+        return orderRepository.findAllByStoreId(storeId).stream()
+                .map(OrderResponse::from)
+                .toList();
     }
 
     // ========== private 헬퍼 ==========
