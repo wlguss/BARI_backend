@@ -78,6 +78,12 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.findNearExpire());
     }
 
+    // RQ-3007 매장 재고 전체 목록 조회
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<?> getInventoriesByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(inventoryService.findByStore(storeId));
+    }
+
     // 존재 유무
     @GetMapping("/exists/{inventoryId}")
     public ResponseEntity<Boolean> exists(@PathVariable Long inventoryId) {

@@ -3,7 +3,6 @@ package com.bari.inventory.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,8 @@ import com.bari.common.exception.BusinessException;
 import com.bari.inventory.dto.request.InventoryKafkaRequest;
 import com.bari.inventory.dto.request.InventoryRequest;
 import com.bari.inventory.dto.request.InventoryUpdateRequest;
-import com.bari.inventory.dto.request.RequestDiscount;
 import com.bari.inventory.dto.response.InventoryResponse;
+import com.bari.inventory.dto.response.StoreInventoryResponse;
 import com.bari.inventory.entity.Inventory;
 import com.bari.inventory.exception.InventoryErrorCode;
 import com.bari.inventory.repository.InventoryRepository;
@@ -136,7 +135,7 @@ public class InventoryService {
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void expireInventories() {
-        int count = inventoryRepository.bulkSoftDelete(LocalDateTime.now());
+        inventoryRepository.bulkSoftDelete(LocalDateTime.now());
     }
 
     // 유통기한 임박 조회
@@ -159,6 +158,15 @@ public class InventoryService {
         return inventoryRepository.findByProductIdInAndDeletedAtIsNull(productIds)
                 .stream()
                 .map(InventoryResponse::fromEntity)
+                .toList();
+    }
+
+    // 특정 매장의 재고 전체 조회 (products JOIN inventories)
+    @Transactional(readOnly = true)
+    public List<StoreInventoryResponse> findByStore(Long storeId) {
+        return inventoryRepository.findByStoreId(storeId)
+                .stream()
+                .map(StoreInventoryResponse::fromRow)
                 .toList();
     }
 

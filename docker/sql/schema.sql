@@ -42,7 +42,9 @@ CREATE TABLE inventories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
     quantity INT NOT NULL,
+    price INT NULL,
     expire_at DATETIME NOT NULL,
+    memo VARCHAR(255) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
     CONSTRAINT fk_inventory_product FOREIGN KEY (product_id) REFERENCES products(id)
