@@ -24,6 +24,16 @@ spec:
                 secretKeyRef:
                   name: bari-app-secrets
                   key: JWT_SECRET
+            - name: STORE_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: STORE_SERVICE_HOST
+            - name: STORE_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: STORE_SERVICE_PORT
             - name: PRODUCT_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
@@ -56,3 +66,23 @@ spec:
                 secretKeyRef:
                   name: gateway-secret
                   key: USER_SERVICE_PORT
+            - name: DISCOUNT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: DISCOUNT_SERVICE_HOST
+            - name: DISCOUNT_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: DISCOUNT_SERVICE_PORT
+            - name: ORDER_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: ORDER_SERVICE_HOST
+            - name: ORDER_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: ORDER_SERVICE_PORT
