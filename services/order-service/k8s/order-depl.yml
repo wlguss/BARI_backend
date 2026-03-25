@@ -88,6 +88,16 @@ spec:
                 secretKeyRef:
                   name: order-service-secret
                   key: INVENTORY_SERVICE_PORT
+            - name: DISCOUNT_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: order-service-secret
+                  key: DISCOUNT_SERVICE_HOST
+            - name: DISCOUNT_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: order-service-secret
+                  key: DISCOUNT_SERVICE_PORT
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
