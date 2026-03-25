@@ -38,4 +38,10 @@ public class InternalInventoryController {
     public ResponseEntity<List<InventoryResponse>> getInventoriesByProductIds(@RequestParam List<Long> productIds) {
         return ResponseEntity.ok(inventoryService.findByProductIds(productIds));
     }
+
+    @GetMapping("/by-ids")
+    @Operation(summary = "[내부] 재고 ID 목록으로 재고 조회", description = "discount-service 전체 할인 목록 조회용")
+    public ResponseEntity<List<InventoryResponse>> getInventoriesByIds(@RequestParam List<Long> inventoryIds) {
+        return ResponseEntity.ok(inventoryService.findByIds(inventoryIds));
+    }
 }

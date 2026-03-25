@@ -161,6 +161,15 @@ public class InventoryService {
                 .toList();
     }
 
+    // 여러 inventoryId로 재고 목록 조회 (전체 할인 목록용)
+    @Transactional(readOnly = true)
+    public List<InventoryResponse> findByIds(List<Long> ids) {
+        return inventoryRepository.findByIdInAndDeletedAtIsNull(ids)
+                .stream()
+                .map(InventoryResponse::fromEntity)
+                .toList();
+    }
+
     // 특정 매장의 재고 전체 조회 (products JOIN inventories)
     @Transactional(readOnly = true)
     public List<StoreInventoryResponse> findByStore(Long storeId) {

@@ -3,7 +3,6 @@ package com.bari.store.entity;
 import com.bari.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -40,12 +39,9 @@ public class Store extends BaseTimeEntity {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     // [추가] 소프트 삭제 메서드
     public void delete() {
-        this.deletedAt = LocalDateTime.now();
+        this.softDelete();
     }
 
     // [추가] 정보 업데이트 메서드 (서비스 로직에서 사용하기 좋음)

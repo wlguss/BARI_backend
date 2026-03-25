@@ -10,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 서비스 간 내부 통신 전용 컨트롤러.
@@ -43,5 +46,16 @@ public class InternalStoreController {
     @Operation(summary = "[내부] ownerId로 매장 조회", description = "order-service에서 사장님 userId로 storeId 조회용")
     public ResponseEntity<ApiResponse<StoreResponseDto>> getStoreByOwnerId(@PathVariable Long ownerId) {
         return ResponseEntity.ok(ApiResponse.success(storeService.getStoreByOwnerId(ownerId)));
+    }
+
+    /**
+     * storeId 목록으로 매장 일괄 조회 (내부용).
+     * discount-service에서 전체 할인 목록 조회 시 매장명 조회에 사용합니다.
+     * ApiResponse 미사용 — inventory/product internal API와 동일한 방식.
+     */
+    @GetMapping("/by-ids")
+    @Operation(summary = "[내부] storeId 목록으로 매장 일괄 조회", description = "discount-service에서 매장명 일괄 조회용")
+    public ResponseEntity<List<StoreResponseDto>> getStoresByIds(@RequestParam List<Long> storeIds) {
+        return ResponseEntity.ok(storeService.getStoresByIds(storeIds));
     }
 }

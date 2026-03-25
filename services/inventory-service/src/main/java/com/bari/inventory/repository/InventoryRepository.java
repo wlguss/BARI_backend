@@ -45,6 +45,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     // 여러 productId로 한 번에 조회 (discount-service 내부 호출용)
     List<Inventory> findByProductIdInAndDeletedAtIsNull(List<Long> productIds);
 
+    // 여러 inventoryId로 한 번에 조회 (전체 할인 목록용)
+    List<Inventory> findByIdInAndDeletedAtIsNull(List<Long> ids);
+
     @Modifying
     @Query("""
             UPDATE Inventory i

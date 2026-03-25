@@ -101,4 +101,13 @@ public class StoreService {
                 .orElseThrow(() -> new BusinessException(StoreErrorCode.STORE_NOT_FOUND));
         return StoreResponseDto.from(store);
     }
+
+    /**
+     * [내부] storeId 목록으로 매장 일괄 조회 (discount-service 전체 할인 목록 조회용).
+     */
+    public List<StoreResponseDto> getStoresByIds(List<Long> storeIds) {
+        return storeRepository.findAllByIdInAndDeletedAtIsNull(storeIds).stream()
+                .map(StoreResponseDto::from)
+                .toList();
+    }
 }

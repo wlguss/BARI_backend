@@ -18,6 +18,7 @@ public class DiscountRequest {
     private Long inventoryId;
     private Integer originalPrice;
     private Integer discountPrice;
+    private Integer discountRate;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
@@ -27,6 +28,7 @@ public class DiscountRequest {
                 .inventoryId(inventoryId)
                 .originalPrice(originalPrice)
                 .discountPrice(discountPrice)
+                .discountRate(discountRate)
                 .startAt(startAt != null ? startAt : LocalDateTime.now())
                 .endAt(endAt)
                 .build();

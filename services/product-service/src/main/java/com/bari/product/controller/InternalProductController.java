@@ -1,5 +1,6 @@
 package com.bari.product.controller;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.product.dto.response.ProductResponseDTO;
 import com.bari.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,8 +37,8 @@ public class InternalProductController {
      */
     @GetMapping("/{productId}")
     @Operation(summary = "[내부] 상품 조회", description = "order-service 등 내부 서비스에서 상품 존재 여부 확인용")
-    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok(productService.getById(productId));
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> getProduct(@PathVariable Long productId) {
+        return ResponseEntity.ok(ApiResponse.success(productService.getById(productId)));
     }
 
     /**
@@ -51,5 +52,11 @@ public class InternalProductController {
     @Operation(summary = "[내부] 매장별 상품 목록 조회", description = "discount-service에서 찜한 매장 할인 임박 상품 조회용")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByStoreIds(@RequestParam List<Long> storeIds) {
         return ResponseEntity.ok(productService.getByStoreIds(storeIds));
+    }
+
+    @GetMapping("/by-ids")
+    @Operation(summary = "[내부] 상품 ID 목록으로 상품 조회", description = "discount-service 전체 할인 목록 조회용")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByIds(@RequestParam List<Long> productIds) {
+        return ResponseEntity.ok(productService.getByIds(productIds));
     }
 }

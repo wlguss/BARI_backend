@@ -17,8 +17,12 @@ public class OrderResponse {
     private Long id;
     private Long customerId;
     private Long storeId;
+    private String storeName;
     private Long productId;
+    private String productName;
     private Integer quantity;
+    private Integer productPrice;
+    private Integer price;
     private OrderStatus status;
     private LocalDateTime pickupTime;
     private LocalDateTime createdAt;
@@ -29,8 +33,13 @@ public class OrderResponse {
                 .id(order.getId())
                 .customerId(order.getCustomerId())
                 .storeId(order.getStoreId())
+                .storeName(order.getStoreName())
                 .productId(order.getProductId())
+                .productName(order.getProductName())
                 .quantity(order.getQuantity())
+                .productPrice(order.getPrice() != null && order.getQuantity() != null && order.getQuantity() > 0
+                        ? order.getPrice() / order.getQuantity() : null)
+                .price(order.getPrice())
                 .status(order.getStatus())
                 .pickupTime(order.getPickupTime())
                 .createdAt(order.getCreatedAt())

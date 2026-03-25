@@ -1,9 +1,11 @@
 package com.bari.order.service;
 
 import com.bari.common.exception.BusinessException;
+import com.bari.order.client.DiscountServiceClient;
 import com.bari.order.client.InventoryServiceClient;
 import com.bari.order.client.ProductServiceClient;
 import com.bari.order.client.StoreServiceClient;
+import com.bari.order.dto.client.DiscountInfo;
 import com.bari.order.dto.client.InventoryInfo;
 import com.bari.order.dto.client.ProductInfo;
 import com.bari.order.dto.client.StoreInfo;
@@ -43,19 +45,27 @@ public class OrderService {
     private final ProductServiceClient productServiceClient;
     private final StoreServiceClient storeServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
+    private final DiscountServiceClient discountServiceClient;
 
     // ========== 고객 API ==========
 
     /**
-     * 고객 주문 목록 조회.
+     * 고객 주문 전체 목록 조회.
      * 본인의 주문만 조회합니다 (삭제된 주문 제외).
+     * status가 null이면 전체, 값이 있으면 해당 status만 필터링합니다.
      *
      * @param customerId 고객 ID (X-User-Id 헤더에서 추출)
-     * @param pageable   페이지네이션
+     * @param status     주문 상태 필터 (null 허용)
      */
-    public Page<OrderResponse> getMyOrders(Long customerId, Pageable pageable) {
-        return orderRepository.findByCustomerId(customerId, pageable)
-                .map(OrderResponse::from);
+    public List<OrderResponse> getMyOrders(Long customerId, OrderStatus status) {
+        if (status != null) {
+            return orderRepository.findAllByCustomerIdAndStatus(customerId, status).stream()
+                    .map(OrderResponse::from)
+                    .toList();
+        }
+        return orderRepository.findAllByCustomerId(customerId).stream()
+                .map(OrderResponse::from)
+                .toList();
     }
 
     /**
@@ -98,7 +108,23 @@ public class OrderService {
         }
         log.debug("재고 확인 완료 - productId: {}, 요청 수량: {}, 현재 재고: {}", request.getProductId(), request.getQuantity(), totalStock);
 
-        Order order = request.toEntity(customerId);
+        // 활성 할인 조회 (discount-service 동기 호출)
+        List<Long> inventoryIds = inventories.stream().map(InventoryInfo::getId).toList();
+        List<DiscountInfo> discounts = discountServiceClient.getActiveDiscounts(inventoryIds);
+
+        // 주문 단가: 할인가 우선, 없으면 정가, 둘 다 없으면 0
+        int unitPrice = discounts.stream()
+                .filter(d -> d.getDiscountPrice() != null)
+                .map(DiscountInfo::getDiscountPrice)
+                .findFirst()
+                .orElseGet(() -> discounts.stream()
+                        .filter(d -> d.getOriginalPrice() != null)
+                        .map(DiscountInfo::getOriginalPrice)
+                        .findFirst()
+                        .orElse(0));
+        int orderPrice = unitPrice * request.getQuantity();
+
+        Order order = request.toEntity(customerId, product.getName(), store.getStoreName(), orderPrice);
         Order saved = orderRepository.save(order);
 
         // 재고 차감 이벤트 발행 → inventory-service가 수신하여 처리

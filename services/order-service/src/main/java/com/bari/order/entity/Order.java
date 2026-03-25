@@ -44,9 +44,21 @@ public class Order extends BaseTimeEntity {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
+    /** 상품명 (주문 시점 저장) */
+    @Column(name = "product_name", length = 100)
+    private String productName;
+
+    /** 매장명 (주문 시점 저장) */
+    @Column(name = "store_name", length = 100)
+    private String storeName;
+
     /** 주문 수량 */
     @Column(nullable = false)
     private Integer quantity;
+
+    /** 주문 금액 (단가 × 수량) */
+    @Column
+    private Integer price;
 
     /** 주문 상태 */
     @Enumerated(EnumType.STRING)
@@ -70,12 +82,17 @@ public class Order extends BaseTimeEntity {
      * @param pickupTime 픽업 예정 시간
      */
     public static Order reserve(Long customerId, Long storeId, Long productId,
-                                Integer quantity, LocalDateTime pickupTime) {
+                                String productName, String storeName,
+                                Integer quantity, Integer price,
+                                LocalDateTime pickupTime) {
         Order order = new Order();
         order.customerId = customerId;
         order.storeId = storeId;
         order.productId = productId;
+        order.productName = productName;
+        order.storeName = storeName;
         order.quantity = quantity;
+        order.price = price;
         order.status = OrderStatus.PENDING;
         order.pickupTime = pickupTime;
         return order;

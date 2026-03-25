@@ -17,4 +17,8 @@ public interface ProductFeignService {
 
     @GetMapping("/api/internal/products/by-stores")
     List<ProductInfo> getProductsByStoreIds(@RequestParam List<Long> storeIds);
+
+    // 여러 productId로 상품 조회 (전체 할인 목록용)
+    @GetMapping("/api/internal/products/by-ids")
+    List<ProductInfo> getProductsByIds(@RequestParam List<Long> productIds);
 }

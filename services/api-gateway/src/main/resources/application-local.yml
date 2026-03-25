@@ -33,7 +33,7 @@ spring:
         - id: discount-service
           uri: http://localhost:8085
           predicates:
-            - Path=/api/store/discounts/**
+            - Path=/api/store/discounts/**,/api/discounts/**
 
         - id: order-service
           uri: http://localhost:8086

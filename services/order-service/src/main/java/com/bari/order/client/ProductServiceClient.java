@@ -5,6 +5,7 @@ import com.bari.order.dto.client.ProductInfo;
 import com.bari.order.exception.OrderErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -42,6 +43,7 @@ public class ProductServiceClient {
                     log.error("product-service 서버 오류 - productId: {}, status: {}", productId, response.getStatusCode());
                     throw new BusinessException(OrderErrorCode.PRODUCT_SERVICE_UNAVAILABLE);
                 })
-                .body(ProductInfo.class);
+                .body(new ParameterizedTypeReference<ApiResponseWrapper<ProductInfo>>() {})
+                .getData();
     }
 }

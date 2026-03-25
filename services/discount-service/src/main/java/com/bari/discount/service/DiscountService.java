@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bari.common.exception.BusinessException;
 import com.bari.discount.dto.client.InventoryInfo;
 import com.bari.discount.dto.client.ProductInfo;
+import com.bari.discount.dto.client.StoreInfo;
 import com.bari.discount.dto.request.DiscountRequest;
+import com.bari.discount.dto.response.DiscountDetailResponse;
 import com.bari.discount.dto.response.DiscountResponse;
 import com.bari.discount.dto.response.ExpiringDiscountResponse;
 import com.bari.discount.dto.response.StoreDiscountResponse;
@@ -31,6 +33,7 @@ public class DiscountService {
     private final DiscountRepository discountRepository;
     private final InventoryFeignService inventoryFeignService;
     private final ProductFeignService productFeignService;
+    private final StoreFeignService storeFeignService;
 
     // RQ-4001 할인 등록
     public DiscountResponse create(DiscountRequest dto) {
@@ -145,7 +148,7 @@ public class DiscountService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tomorrow = now.plusDays(1).toLocalDate().atTime(23, 59, 59);
         List<Discount> discounts = discountRepository
-                .findByInventoryIdInAndEndAtBetweenAndDeletedAtIsNull(inventoryIds, now, tomorrow);
+                .findByInventoryIdInAndEndAtBetweenAndDeletedAtIsNullOrderByCreatedAtDesc(inventoryIds, now, tomorrow);
 
         // 6. 응답 조합
         return discounts.stream()
@@ -192,6 +195,81 @@ public class DiscountService {
                     ProductInfo product = productMap.get(productId);
                     return StoreDiscountResponse.of(d, product);
                 })
+                .toList();
+    }
+
+    // 유저용 전체 할인 목록 조회
+    @Transactional(readOnly = true)
+    public List<StoreDiscountResponse> getAllDiscounts() {
+        // 1. 전체 활성 할인 조회
+        List<Discount> discounts = discountRepository.findAllByDeletedAtIsNull();
+        if (discounts.isEmpty()) {
+            return List.of();
+        }
+
+        // 2. inventoryId 목록 추출 → 재고 조회 (inventoryId → productId 매핑)
+        List<Long> inventoryIds = discounts.stream()
+                .map(Discount::getInventoryId)
+                .distinct()
+                .toList();
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(inventoryIds);
+        Map<Long, Long> inventoryToProductId = inventories.stream()
+                .collect(Collectors.toMap(InventoryInfo::getId, InventoryInfo::getProductId));
+
+        // 3. productId 목록 추출 → 상품 조회 (productId → ProductInfo 매핑)
+        List<Long> productIds = inventoryToProductId.values().stream().distinct().toList();
+        List<ProductInfo> products = productFeignService.getProductsByIds(productIds);
+        Map<Long, ProductInfo> productMap = products.stream()
+                .collect(Collectors.toMap(ProductInfo::getId, p -> p));
+
+        // 4. storeId 목록 추출 → 매장 조회 (storeId → StoreInfo 매핑)
+        List<Long> storeIds = products.stream().map(ProductInfo::getStoreId).distinct().toList();
+        List<StoreInfo> stores = storeFeignService.getStoresByIds(storeIds);
+        Map<Long, StoreInfo> storeMap = stores.stream()
+                .collect(Collectors.toMap(StoreInfo::getId, s -> s));
+
+        // 5. 응답 조합
+        return discounts.stream()
+                .filter(d -> inventoryToProductId.containsKey(d.getInventoryId()))
+                .map(d -> {
+                    Long productId = inventoryToProductId.get(d.getInventoryId());
+                    ProductInfo product = productMap.get(productId);
+                    StoreInfo store = product != null ? storeMap.get(product.getStoreId()) : null;
+                    return StoreDiscountResponse.of(d, product, store);
+                })
+                .toList();
+    }
+
+    // 고객용 할인 상품 상세 조회
+    @Transactional(readOnly = true)
+    public DiscountDetailResponse getDiscountDetail(Long discountId) {
+        // 1. 할인 조회
+        Discount discount = discountRepository.findByIdAndDeletedAtIsNull(discountId)
+                .orElseThrow(() -> new BusinessException(DiscountErrorCode.DISCOUNT_NOT_FOUND));
+
+        // 2. 재고 조회
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(List.of(discount.getInventoryId()));
+        InventoryInfo inventory = inventories.stream().findFirst()
+                .orElseThrow(() -> new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND));
+
+        // 3. 상품 조회
+        List<ProductInfo> products = productFeignService.getProductsByIds(List.of(inventory.getProductId()));
+        ProductInfo product = products.stream().findFirst()
+                .orElseThrow(() -> new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND));
+
+        // 4. 매장 조회
+        List<StoreInfo> stores = storeFeignService.getStoresByIds(List.of(product.getStoreId()));
+        StoreInfo store = stores.stream().findFirst().orElse(null);
+
+        return DiscountDetailResponse.of(discount, inventory, product, store);
+    }
+
+    // order-service용: 재고 ID 목록의 현재 활성 할인 조회
+    @Transactional(readOnly = true)
+    public List<DiscountResponse> getActiveDiscountsByInventoryIds(List<Long> inventoryIds) {
+        return discountRepository.findActiveByInventoryIds(inventoryIds, LocalDateTime.now())
+                .stream()
+                .map(DiscountResponse::from)
                 .toList();
     }
 

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import com.bari.common.response.ApiResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,16 +39,8 @@ public class InventoryController {
 
     // RQ-3002 재고 조회 (상품 기준)
     @GetMapping("/product/{productId}")
-    public ResponseEntity<?> getInventories(
-            @PathVariable Long productId) {
-
-        // if (productId != null) {
-        // return ResponseEntity.ok(inventoryService.findByProduct(productId));
-        // }
-        System.out.println("==== Controller called with productId: " + productId);
-        return ResponseEntity.ok(inventoryService.findByProduct(productId));
-        // 전체 조회 (확장성 고려)
-        // return ResponseEntity.ok(inventoryService.findAll());
+    public ResponseEntity<ApiResponse<?>> getInventories(@PathVariable Long productId) {
+        return ResponseEntity.ok(ApiResponse.success(inventoryService.findByProduct(productId)));
     }
 
     // RQ-3003 재고 수정

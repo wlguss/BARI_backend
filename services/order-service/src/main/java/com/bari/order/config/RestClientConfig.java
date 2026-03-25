@@ -20,6 +20,9 @@ public class RestClientConfig {
     @Value("${services.inventory.url}")
     private String inventoryServiceUrl;
 
+    @Value("${services.discount.url}")
+    private String discountServiceUrl;
+
     /**
      * product-service 전용 RestClient.
      */
@@ -47,6 +50,16 @@ public class RestClientConfig {
     public RestClient inventoryRestClient() {
         return RestClient.builder()
                 .baseUrl(inventoryServiceUrl)
+                .build();
+    }
+
+    /**
+     * discount-service 전용 RestClient.
+     */
+    @Bean
+    public RestClient discountRestClient() {
+        return RestClient.builder()
+                .baseUrl(discountServiceUrl)
                 .build();
     }
 }

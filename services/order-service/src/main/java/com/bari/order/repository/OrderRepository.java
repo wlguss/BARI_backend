@@ -13,9 +13,13 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    /** 고객 주문 목록 조회 (삭제되지 않은 것만) */
-    @Query("SELECT o FROM Order o WHERE o.customerId = :customerId AND o.deletedAt IS NULL")
-    Page<Order> findByCustomerId(@Param("customerId") Long customerId, Pageable pageable);
+    /** 고객 주문 전체 목록 조회 (삭제되지 않은 것만) */
+    @Query("SELECT o FROM Order o WHERE o.customerId = :customerId AND o.deletedAt IS NULL ORDER BY o.createdAt DESC")
+    List<Order> findAllByCustomerId(@Param("customerId") Long customerId);
+
+    /** 고객 주문 목록 조회 — status 필터 */
+    @Query("SELECT o FROM Order o WHERE o.customerId = :customerId AND o.status = :status AND o.deletedAt IS NULL ORDER BY o.createdAt DESC")
+    List<Order> findAllByCustomerIdAndStatus(@Param("customerId") Long customerId, @Param("status") OrderStatus status);
 
     /** 매장 주문 목록 조회 (삭제되지 않은 것만, 페이지네이션용) */
     @Query("SELECT o FROM Order o WHERE o.storeId = :storeId AND o.deletedAt IS NULL")

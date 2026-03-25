@@ -44,6 +44,7 @@ public class InventoryServiceClient {
                     log.error("inventory-service 서버 오류 - productId: {}, status: {}", productId, response.getStatusCode());
                     throw new BusinessException(OrderErrorCode.INVENTORY_SERVICE_UNAVAILABLE);
                 })
-                .body(new ParameterizedTypeReference<>() {});
+                .body(new ParameterizedTypeReference<ApiResponseWrapper<List<InventoryInfo>>>() {})
+                .getData();
     }
 }

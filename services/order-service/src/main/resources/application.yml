@@ -41,6 +41,8 @@ services:
     url: http://${STORE_SERVICE_HOST:localhost}:${STORE_SERVICE_PORT:8082}
   inventory:
     url: http://${INVENTORY_SERVICE_HOST:localhost}:${INVENTORY_SERVICE_PORT:8084}
+  discount:
+    url: http://${DISCOUNT_SERVICE_HOST:localhost}:${DISCOUNT_SERVICE_PORT:8085}
 
 # JWT 설정 (32자 이상 시크릿 키 필수)
 jwt:

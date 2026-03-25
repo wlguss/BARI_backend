@@ -18,6 +18,7 @@ public class ExpiringDiscountResponse {
     private Long inventoryId;
     private Long productId;
     private String productName;
+    private String imageUrl;
     private Long storeId;
     private Integer discountPrice;
     private Integer discountRate;
@@ -29,6 +30,7 @@ public class ExpiringDiscountResponse {
                 .inventoryId(discount.getInventoryId())
                 .productId(product.getId())
                 .productName(product.getName())
+                .imageUrl(product.getImageUrl())
                 .storeId(product.getStoreId())
                 .discountPrice(discount.getDiscountPrice())
                 .discountRate(discount.getDiscountRate())
