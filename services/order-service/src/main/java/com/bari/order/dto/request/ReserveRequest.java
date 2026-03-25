@@ -41,7 +41,7 @@ public class ReserveRequest {
     private LocalDateTime pickupTime;
 
     /** DTO → Entity */
-    public Order toEntity(Long customerId) {
-        return Order.reserve(customerId, storeId, productId, quantity, pickupTime);
+    public Order toEntity(Long customerId, String productName, String storeName, Integer price) {
+        return Order.reserve(customerId, storeId, productId, productName, storeName, quantity, price, pickupTime);
     }
 }

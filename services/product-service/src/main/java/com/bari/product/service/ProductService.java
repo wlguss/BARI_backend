@@ -115,6 +115,14 @@ public class ProductService {
                 .toList();
     }
 
+    // 여러 productId로 한 번에 상품 조회 (전체 할인 목록용)
+    public List<ProductResponseDTO> getByIds(List<Long> ids) {
+        return productRepository.findAllByIdInAndDeletedAtIsNull(ids)
+                .stream()
+                .map(ProductResponseDTO::from)
+                .toList();
+    }
+
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
     }

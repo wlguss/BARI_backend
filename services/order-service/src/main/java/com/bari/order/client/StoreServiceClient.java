@@ -5,6 +5,7 @@ import com.bari.order.dto.client.StoreInfo;
 import com.bari.order.exception.OrderErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -42,7 +43,8 @@ public class StoreServiceClient {
                     log.error("store-service 서버 오류 - storeId: {}, status: {}", storeId, response.getStatusCode());
                     throw new BusinessException(OrderErrorCode.STORE_SERVICE_UNAVAILABLE);
                 })
-                .body(StoreInfo.class);
+                .body(new ParameterizedTypeReference<ApiResponseWrapper<StoreInfo>>() {})
+                .getData();
     }
 
     /**
@@ -67,6 +69,7 @@ public class StoreServiceClient {
                     log.error("store-service 서버 오류 - ownerId: {}, status: {}", ownerId, response.getStatusCode());
                     throw new BusinessException(OrderErrorCode.STORE_SERVICE_UNAVAILABLE);
                 })
-                .body(StoreInfo.class);
+                .body(new ParameterizedTypeReference<ApiResponseWrapper<StoreInfo>>() {})
+                .getData();
     }
 }

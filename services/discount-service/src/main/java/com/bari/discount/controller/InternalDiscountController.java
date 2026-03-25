@@ -1,5 +1,6 @@
 package com.bari.discount.controller;
 
+import com.bari.discount.dto.response.DiscountResponse;
 import com.bari.discount.dto.response.ExpiringDiscountResponse;
 import com.bari.discount.service.DiscountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,5 +39,18 @@ public class InternalDiscountController {
     @Operation(summary = "[내부] 찜한 매장 할인 임박 상품 조회", description = "store-service 홈화면 노출용 (내일 마감 기준)")
     public ResponseEntity<List<ExpiringDiscountResponse>> getExpiringDiscounts(@RequestParam List<Long> storeIds) {
         return ResponseEntity.ok(discountService.getExpiringDiscountsByStoreIds(storeIds));
+    }
+
+    /**
+     * 재고 ID 목록의 현재 활성 할인 조회 (내부용).
+     * order-service에서 픽업 예약 시 할인 적용 가격 계산에 사용합니다.
+     *
+     * @param inventoryIds 재고 ID 목록
+     * @return 현재 활성 할인 목록 (startAt <= now <= endAt)
+     */
+    @GetMapping("/active-by-inventories")
+    @Operation(summary = "[내부] 재고별 활성 할인 조회", description = "order-service 주문 가격 계산용")
+    public ResponseEntity<List<DiscountResponse>> getActiveDiscountsByInventoryIds(@RequestParam List<Long> inventoryIds) {
+        return ResponseEntity.ok(discountService.getActiveDiscountsByInventoryIds(inventoryIds));
     }
 }

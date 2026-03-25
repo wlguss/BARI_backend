@@ -18,8 +18,13 @@ CREATE TABLE users (
 CREATE TABLE stores (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    address VARCHAR(255),
-    owner_id BIGINT,
+    description VARCHAR(500) NULL,
+    address VARCHAR(255) NULL,
+    phone VARCHAR(20) NULL,
+    business_hours VARCHAR(255) NULL,
+    category VARCHAR(100) NULL,
+    image_url VARCHAR(255) NULL,
+    owner_id BIGINT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
     CONSTRAINT fk_store_owner FOREIGN KEY (owner_id) REFERENCES users(id)
@@ -67,18 +72,21 @@ CREATE TABLE discounts (
 -- 주문 테이블
 CREATE TABLE orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    customer_id BIGINT NOT NULL,
     store_id BIGINT NOT NULL,
-    inventory_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    product_name VARCHAR(100) NULL,
+    store_name VARCHAR(100) NULL,
     quantity INT NOT NULL,
-    price INT NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'RESERVED',
+    price INT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    pickup_time DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
     CONSTRAINT chk_orders_status CHECK (status IN ('PENDING','CONFIRMED','READY','COMPLETED','CANCELLED')),
-    CONSTRAINT fk_order_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES users(id),
     CONSTRAINT fk_order_store FOREIGN KEY (store_id) REFERENCES stores(id),
-    CONSTRAINT fk_order_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
+    CONSTRAINT fk_order_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 -- 즐겨찾기 가게 테이블

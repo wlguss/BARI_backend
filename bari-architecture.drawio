@@ -1,0 +1,130 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram name="bari-backend Architecture" id="bari-arch">
+    <mxGraphModel dx="1403" dy="884" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="label-client" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#999999;" value="Client" vertex="1">
+          <mxGeometry height="30" width="70" x="120" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="label-gateway" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#999999;" value="Gateway" vertex="1">
+          <mxGeometry height="30" width="70" x="120" y="162" as="geometry" />
+        </mxCell>
+        <mxCell id="label-services" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#999999;" value="Services" vertex="1">
+          <mxGeometry height="30" width="70" x="120" y="302" as="geometry" />
+        </mxCell>
+        <mxCell id="client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;arcSize=10;verticalAlign=bottom;" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;Mobile / Web" vertex="1">
+          <mxGeometry height="65" width="180" x="590" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="icon-client" parent="1" style="shape=mxgraph.android.phone2;strokeColor=#6c8ebf;fillColor=#dae8fc;" value="" vertex="1">
+          <mxGeometry height="26" width="15" x="652" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=12;arcSize=5;verticalAlign=bottom;" value="&lt;b&gt;API Gateway&lt;/b&gt;  :8080  (Spring Cloud Gateway)" vertex="1">
+          <mxGeometry height="65" width="820" x="270" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="e-client-gw" edge="1" parent="1" source="client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" value="&lt;b&gt;user-service&lt;/b&gt;&lt;br&gt;:8081" vertex="1">
+          <mxGeometry height="70" width="140" x="220" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-store" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" value="&lt;b&gt;store-service&lt;/b&gt;&lt;br&gt;:8082" vertex="1">
+          <mxGeometry height="70" width="140" x="380" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-product" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" value="&lt;b&gt;product-service&lt;/b&gt;&lt;br&gt;:8083" vertex="1">
+          <mxGeometry height="70" width="140" x="540" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-inventory" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" value="&lt;b&gt;inventory-service&lt;/b&gt;&lt;br&gt;:8084" vertex="1">
+          <mxGeometry height="70" width="140" x="696.87" y="286" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-discount" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;" value="&lt;b&gt;discount-service&lt;/b&gt;&lt;br&gt;:8085" vertex="1">
+          <mxGeometry height="70" width="140" x="1020" y="286" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-order" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=middle;align=center;" value="&lt;b&gt;order-service&lt;/b&gt;&lt;br&gt;:8086" vertex="1">
+          <mxGeometry height="70" width="140" x="860" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-user" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-store" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-store">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-product" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-product">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-inventory" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-inventory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-discount" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-discount">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-gw-order" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;" target="svc-order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="infra-mariadb" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=bottom;" value="&lt;b&gt;MariaDB&lt;/b&gt;&lt;br&gt;:3306" vertex="1">
+          <mxGeometry height="70" width="100" x="629.5" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="infra-redis" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#333333;fontSize=11;verticalAlign=bottom;" value="&lt;b&gt;Redis&lt;/b&gt;&lt;br&gt;:6379" vertex="1">
+          <mxGeometry height="70" width="100" x="240" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="icon-redis" parent="1" style="image;html=1;aspect=fixed;align=center;sketch=0;image=img/lib/mscae/Cache_Redis_Product.svg;" value="" vertex="1">
+          <mxGeometry height="23" width="28.31" x="275.85" y="467.5" as="geometry" />
+        </mxCell>
+        <mxCell id="infra-kafka" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#333333;fontSize=11;verticalAlign=bottom;" value="&lt;b&gt;Kafka&lt;/b&gt;&lt;br&gt;:9092" vertex="1">
+          <mxGeometry height="70" width="100" x="800" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="e-user-db" edge="1" parent="1" source="svc-user" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-store-db" edge="1" parent="1" source="svc-store" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-product-db" edge="1" parent="1" source="svc-product" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-inventory-db" edge="1" parent="1" source="svc-inventory" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-discount-db" edge="1" parent="1" source="svc-discount" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-order-db" edge="1" parent="1" source="svc-order" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#999999;" target="infra-mariadb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-user-redis" edge="1" parent="1" source="svc-user" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d6b656;fontColor=#d6b656;fontSize=10;" target="infra-redis" value="Refresh Token">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-order-kafka" edge="1" parent="1" source="svc-order" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#b85450;fontColor=#b85450;fontSize=10;endArrow=block;endFill=1;" target="infra-kafka" value="publish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-kafka-inventory" edge="1" parent="1" source="infra-kafka" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#b85450;fontColor=#b85450;fontSize=10;endArrow=block;endFill=1;" target="svc-inventory" value="consume">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9f9f9;strokeColor=#cccccc;fontSize=11;align=left;verticalAlign=top;" value="" vertex="1">
+          <mxGeometry height="155" width="190" x="970" y="417.5" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;" value="범례" vertex="1">
+          <mxGeometry height="20" width="80" x="985" y="422.5" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-http" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#333333;" value="──── HTTP (Gateway)" vertex="1">
+          <mxGeometry height="20" width="170" x="985" y="447.5" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-kafka" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#b85450;" value="- - - Kafka 이벤트" vertex="1">
+          <mxGeometry height="20" width="170" x="985" y="468.5" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-db" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#999999;" value="- - - DB 연결" vertex="1">
+          <mxGeometry height="20" width="170" x="985" y="493.5" as="geometry" />
+        </mxCell>
+        <mxCell id="lq8vuHYXOXq7l-Feipm6-1" parent="1" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;fillColor=#FF6A00;strokeColor=none;shape=mxgraph.alibaba_cloud.mariadb;" value="" vertex="1">
+          <mxGeometry height="25.4" width="33.73" x="663.14" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="lq8vuHYXOXq7l-Feipm6-3" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.api_gateway;fillColor=#D9A741;gradientColor=none;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="664.5" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="lq8vuHYXOXq7l-Feipm6-4" parent="1" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.computer;pointerEvents=1;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="685" y="38" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

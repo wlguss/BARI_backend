@@ -29,7 +29,10 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        // 내부 서비스 간 통신 전용 — api-gateway에서 라우팅하지 않음
+                        .requestMatchers("/api/internal/**").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(headerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

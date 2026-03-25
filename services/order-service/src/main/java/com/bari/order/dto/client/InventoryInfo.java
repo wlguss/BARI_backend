@@ -16,5 +16,6 @@ public class InventoryInfo {
     private Long id;
     private Long productId;
     private Integer quantity;
+    private Integer price;
     private LocalDateTime expireAt;
 }

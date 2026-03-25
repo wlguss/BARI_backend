@@ -54,11 +54,11 @@ spring:
           predicates:
             - Path=/api/store/inventory/**,/api/inventory/images/**
 
-        # discount-service 라우팅 
+        # discount-service 라우팅
         - id: discount-service
           uri: http://${DISCOUNT_SERVICE_HOST:localhost}:${DISCOUNT_SERVICE_PORT:8085}
           predicates:
-            - Path=/api/store/discounts/**,/api/discount/images/**
+            - Path=/api/store/discounts/**,/api/discounts/**,/api/discount/images/**
             
         # order-service 라우팅
         - id: order-service

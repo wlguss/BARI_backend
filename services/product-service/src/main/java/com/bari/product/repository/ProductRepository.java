@@ -22,4 +22,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>{
 
     // 여러 storeId로 한 번에 조회 (찜한 매장 할인 임박 상품용)
     List<ProductEntity> findAllByStoreIdInAndDeletedAtIsNull(List<Long> storeIds);
+
+    // 여러 productId로 한 번에 조회 (전체 할인 목록용)
+    List<ProductEntity> findAllByIdInAndDeletedAtIsNull(List<Long> ids);
 }

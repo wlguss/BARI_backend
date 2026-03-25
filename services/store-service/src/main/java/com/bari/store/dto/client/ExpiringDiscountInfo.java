@@ -16,6 +16,7 @@ public class ExpiringDiscountInfo {
     private Long inventoryId;
     private Long productId;
     private String productName;
+    private String imageUrl;
     private Long storeId;
     private Integer discountPrice;
     private Integer discountRate;
