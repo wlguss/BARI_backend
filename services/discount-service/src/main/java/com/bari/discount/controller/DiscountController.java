@@ -26,6 +26,12 @@ public class DiscountController {
 
     private final DiscountService discountService;
 
+    // RQ-4005 매장 기준 할인 전체 목록 조회
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<?> getDiscountsByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(discountService.getDiscountsByStore(storeId));
+    }
+
     // 상세 조회
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getDiscount(@PathVariable Long inventoryId) {

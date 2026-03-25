@@ -15,6 +15,7 @@ import com.bari.discount.dto.client.ProductInfo;
 import com.bari.discount.dto.request.DiscountRequest;
 import com.bari.discount.dto.response.DiscountResponse;
 import com.bari.discount.dto.response.ExpiringDiscountResponse;
+import com.bari.discount.dto.response.StoreDiscountResponse;
 import com.bari.discount.entity.Discount;
 import com.bari.discount.exception.DiscountErrorCode;
 import com.bari.discount.repository.DiscountRepository;
@@ -152,6 +153,44 @@ public class DiscountService {
                     Long productId = inventoryToProductId.get(d.getInventoryId());
                     ProductInfo product = productMap.get(productId);
                     return ExpiringDiscountResponse.of(d, product);
+                })
+                .toList();
+    }
+
+    // RQ-4005 매장 기준 할인 전체 목록 조회
+    @Transactional(readOnly = true)
+    public List<StoreDiscountResponse> getDiscountsByStore(Long storeId) {
+        // 1. storeId → 해당 매장의 상품 목록 조회
+        List<ProductInfo> products = productFeignService.getProductsByStoreIds(List.of(storeId));
+        if (products.isEmpty()) {
+            return List.of();
+        }
+
+        // 2. productId → ProductInfo 맵 구성
+        Map<Long, ProductInfo> productMap = products.stream()
+                .collect(Collectors.toMap(ProductInfo::getId, p -> p));
+        List<Long> productIds = List.copyOf(productMap.keySet());
+
+        // 3. productIds → 재고 목록 조회
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByProductIds(productIds);
+        if (inventories.isEmpty()) {
+            return List.of();
+        }
+
+        // 4. inventoryId → productId 맵 구성
+        Map<Long, Long> inventoryToProductId = inventories.stream()
+                .collect(Collectors.toMap(InventoryInfo::getId, InventoryInfo::getProductId));
+        List<Long> inventoryIds = List.copyOf(inventoryToProductId.keySet());
+
+        // 5. inventoryIds로 활성 할인 전체 조회
+        List<Discount> discounts = discountRepository.findByInventoryIdInAndDeletedAtIsNull(inventoryIds);
+
+        // 6. 응답 조합: discount + imageUrl(상품)
+        return discounts.stream()
+                .map(d -> {
+                    Long productId = inventoryToProductId.get(d.getInventoryId());
+                    ProductInfo product = productMap.get(productId);
+                    return StoreDiscountResponse.of(d, product);
                 })
                 .toList();
     }

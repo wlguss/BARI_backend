@@ -12,6 +12,19 @@ import com.bari.inventory.entity.Inventory;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
+    // 매장 기준 재고 전체 조회 (products JOIN inventories)
+    // 반환: [id, product_id, quantity, expire_at, name, description, image_url]
+    @Query(value = """
+            SELECT i.id, i.product_id, i.quantity, i.expire_at, i.created_at,
+                   p.name, p.description, p.image_url
+            FROM inventories i
+            JOIN products p ON i.product_id = p.id
+            WHERE p.store_id = :storeId
+              AND i.deleted_at IS NULL
+              AND p.deleted_at IS NULL
+            """, nativeQuery = true)
+    List<Object[]> findByStoreId(@Param("storeId") Long storeId);
+
     // 특정 상품 재고 조회
     List<Inventory> findByProductIdAndDeletedAtIsNull(Long productId);
 

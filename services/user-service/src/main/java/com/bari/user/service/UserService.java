@@ -2,11 +2,14 @@ package com.bari.user.service;
 
 import com.bari.common.exception.BusinessException;
 import com.bari.security.jwt.JwtTokenProvider;
+import com.bari.user.client.StoreInfo;
+import com.bari.user.client.StoreServiceClient;
 import com.bari.user.dto.request.LoginRequest;
 import com.bari.user.dto.request.SignUpRequest;
 import com.bari.user.dto.response.LoginResponse;
 import com.bari.user.dto.response.UserResponse;
 import com.bari.user.entity.User;
+import com.bari.user.entity.UserRole;
 import com.bari.user.exception.UserErrorCode;
 import com.bari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final StoreServiceClient storeServiceClient;
 
     /**
      * RedisTemplate<String, String>: key-value 모두 String 타입
@@ -106,6 +110,15 @@ public class UserService {
 
         log.info("로그인 성공 - userId: {}", user.getId());
 
+        // OWNER 역할인 경우 storeId/storeName 조회
+        if (user.getRole() == UserRole.OWNER) {
+            StoreInfo store = storeServiceClient.getStoreByOwnerId(user.getId());
+            if (store != null) {
+                return LoginResponse.ofOwner(accessToken, refreshToken, user.getId(), user.getRole(),
+                        store.getId(), store.getStoreName());
+            }
+        }
+
         return LoginResponse.of(accessToken, refreshToken, user.getId(), user.getRole());
     }
 
@@ -145,6 +158,15 @@ public class UserService {
         redisTemplate.opsForValue().set(redisKey, newRefreshToken, REFRESH_TOKEN_TTL_DAYS, TimeUnit.DAYS);
 
         log.info("토큰 갱신 성공 - userId: {}", userId);
+
+        // OWNER 역할인 경우 storeId/storeName 조회
+        if (user.getRole() == UserRole.OWNER) {
+            StoreInfo store = storeServiceClient.getStoreByOwnerId(user.getId());
+            if (store != null) {
+                return LoginResponse.ofOwner(newAccessToken, newRefreshToken, user.getId(), user.getRole(),
+                        store.getId(), store.getStoreName());
+            }
+        }
 
         return LoginResponse.of(newAccessToken, newRefreshToken, user.getId(), user.getRole());
     }
