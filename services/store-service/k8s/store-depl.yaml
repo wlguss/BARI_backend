@@ -23,7 +23,12 @@ spec:
               value: "prod"
               
             - name: JAVA_OPTS
-              value: "-Xms128m -Xmx256m"  
+              value: "-Xms128m -Xmx256m"
+
+            - name: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+              value: "2"
+            - name: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+              value: "1"
 
             - name: DB_HOST
               valueFrom:
