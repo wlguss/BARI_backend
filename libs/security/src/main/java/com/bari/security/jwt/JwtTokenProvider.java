@@ -115,7 +115,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * 토큰 유효성 검증.
+     * 토큰 유효성 검증.   
      *
      * @param token JWT 토큰
      * @return 유효하면 true, 만료/변조 등이면 false

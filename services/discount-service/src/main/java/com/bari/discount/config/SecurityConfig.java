@@ -13,6 +13,7 @@ import com.bari.security.header.HeaderAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
+// gateway를 통해 들어오는 요청을 어떻게 인증할지를 정의한 설정 파일 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

@@ -24,7 +24,6 @@ services:
       MYSQL_ROOT_PASSWORD: root1234
       MYSQL_DATABASE: bari
       MYSQL_USER: bari
-      MYSQL_PASSWORD: bari1234
     ports:
       - "3306:3306"
     volumes:
@@ -80,6 +79,7 @@ services:
       RABBITMQ_DEFAULT_USER: bari
       RABBITMQ_DEFAULT_PASS: bari1234
 
+# 컨테이너를 재시작하거나 삭제해도 DB/redis 데이터는 유지
 volumes:
   bari-mariadb-data:
   bari-redis-data:
