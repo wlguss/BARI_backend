@@ -18,7 +18,7 @@
     { "key": "user_id",               "value": "", "type": "string" }
   ],
   "item": [
-    {
+    { 
       "name": "인증 API (user-service :8081)",
       "item": [
         {
