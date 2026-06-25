@@ -1,6 +1,7 @@
 package com.bari.inventory.service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.kafka.annotation.KafkaListener;
@@ -186,33 +187,62 @@ public class InventoryService {
 
     @KafkaListener(topics = "order.reserved")
     public void quantityConsumer(String message) {
-
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
             InventoryKafkaRequest request = objectMapper.readValue(message, InventoryKafkaRequest.class);
 
-            Inventory inventory = inventoryRepository
-                    .findById(request.getInventoryId())
-                    .orElseThrow(() -> new BusinessException(InventoryErrorCode.INVENTORY_NOT_FOUND));
+            // 유통기한 임박 순으로 정렬 후 FIFO 차감
+            List<Inventory> inventories = inventoryRepository
+                    .findByProductIdAndDeletedAtIsNull(request.getProductId())
+                    .stream()
+                    .sorted(Comparator.comparing(Inventory::getExpireAt,
+                            Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
 
-            if (inventory.getDeletedAt() != null) {
-                throw new BusinessException(InventoryErrorCode.INVENTORY_DELETED);
+            int totalStock = inventories.stream().mapToInt(Inventory::getQuantity).sum();
+            if (totalStock < request.getQuantity()) {
+                log.warn("재고 부족 - productId: {}, 요청 수량: {}, 현재 재고: {}",
+                        request.getProductId(), request.getQuantity(), totalStock);
+                return;
             }
 
-            // 🔥 재고 부족 체크
-            if (inventory.getQuantity() < request.getQuantity()) {
-                throw new BusinessException(InventoryErrorCode.INSUFFICIENT_STOCK);
+            int remaining = request.getQuantity();
+            for (Inventory inv : inventories) {
+                if (remaining <= 0) break;
+                int deduct = Math.min(inv.getQuantity(), remaining);
+                inv.updateQuantity(deduct);
+                remaining -= deduct;
             }
 
-            inventory.updateQuantity(request.getQuantity());
-
-        } catch (BusinessException e) {
-            // 비즈니스 에러는 로깅만
-            log.warn("재고 처리 실패: {}", e.getMessage());
+            log.info("재고 차감 완료 - productId: {}, 차감 수량: {}", request.getProductId(), request.getQuantity());
         } catch (Exception e) {
-            // 시스템 에러
-            log.error("Kafka 처리 중 오류", e);
+            log.error("Kafka order.reserved 처리 중 오류", e);
+        }
+    }
+
+    @KafkaListener(topics = "order.cancelled")
+    public void cancelConsumer(String message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            InventoryKafkaRequest request = objectMapper.readValue(message, InventoryKafkaRequest.class);
+
+            // 차감 시 가장 먼저 건드린 재고(유통기한 임박)에 복구
+            List<Inventory> inventories = inventoryRepository
+                    .findByProductIdAndDeletedAtIsNull(request.getProductId())
+                    .stream()
+                    .sorted(Comparator.comparing(Inventory::getExpireAt,
+                            Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
+
+            if (inventories.isEmpty()) {
+                log.warn("재고 복구 대상 없음 - productId: {}", request.getProductId());
+                return;
+            }
+
+            inventories.get(0).restoreQuantity(request.getQuantity());
+            log.info("재고 복구 완료 - productId: {}, 복구 수량: {}", request.getProductId(), request.getQuantity());
+        } catch (Exception e) {
+            log.error("Kafka order.cancelled 처리 중 오류", e);
         }
     }
 
