@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  * GlobalExceptionHandler에서 BusinessException 발생 시
  * 이 enum의 값을 기반으로 에러 응답을 생성합니다.
  */
-@Getter
+@Getter  // 모든 필드에 getXxx() 메서드 자동 생성
 @RequiredArgsConstructor
 public enum UserErrorCode implements ErrorCode {
 
