@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
  * }
  */
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL) // 필드 값이 null이면 JSON에서 제거
 public class ApiResponse<T> {
 
     /** HTTP 상태 코드 */
@@ -26,8 +26,9 @@ public class ApiResponse<T> {
     private final String message;
 
     /** 응답 데이터 (null이면 JSON에서 제거) */
-    private final T data;
+    private final T data; 
 
+    // 생성자를 private으로 설정하여 외부에서 직접 인스턴스를 생성하지 못하도록 강제 -> static method를 통해서만 간접적으로 필드값 주입
     private ApiResponse(int status, String message, T data) {
         this.status = status;
         this.message = message;

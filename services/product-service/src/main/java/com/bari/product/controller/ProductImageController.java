@@ -1,5 +1,6 @@
 package com.bari.product.controller;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.product.dto.request.ProductImagePresignRequest;
 import com.bari.product.dto.response.ProductImagePresignResponse;
 import com.bari.product.service.ProductImageService;
@@ -7,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,10 +30,9 @@ public class ProductImageController {
                     """
     )
     @PostMapping(value = "/presigned-url", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductImagePresignResponse> createPresignedUploadUrl(
+    public ResponseEntity<ApiResponse<ProductImagePresignResponse>> createPresignedUploadUrl(
             @Valid @RequestBody ProductImagePresignRequest request
     ) {
-        ProductImagePresignResponse response = productImageService.generatePresignedUploadUrl(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ApiResponse.success(productImageService.generatePresignedUploadUrl(request)));
     }
 }

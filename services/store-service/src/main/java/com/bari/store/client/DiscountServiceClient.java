@@ -33,11 +33,12 @@ public class DiscountServiceClient {
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
         try {
-            return discountRestClient.get()
+            ApiResponseWrapper<List<ExpiringDiscountInfo>> response = discountRestClient.get()
                     .uri("/api/internal/discounts/expiring?storeIds=" + storeIdsParam)
                     .header("X-User-Id", String.valueOf(userId))
                     .retrieve()
-                    .body(new ParameterizedTypeReference<>() {});
+                    .body(new ParameterizedTypeReference<ApiResponseWrapper<List<ExpiringDiscountInfo>>>() {});
+            return response != null ? response.getData() : List.of();
         } catch (RestClientException e) {
             throw new BusinessException(StoreErrorCode.DISCOUNT_SERVICE_UNAVAILABLE);
         }

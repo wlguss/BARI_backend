@@ -1,5 +1,6 @@
 package com.bari.inventory.controller;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.inventory.dto.response.InventoryResponse;
 import com.bari.inventory.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,13 +36,13 @@ public class InternalInventoryController {
      */
     @GetMapping("/by-products")
     @Operation(summary = "[내부] 상품별 재고 목록 조회", description = "discount-service에서 찜한 매장 할인 임박 상품 조회용")
-    public ResponseEntity<List<InventoryResponse>> getInventoriesByProductIds(@RequestParam List<Long> productIds) {
-        return ResponseEntity.ok(inventoryService.findByProductIds(productIds));
+    public ResponseEntity<ApiResponse<List<InventoryResponse>>> getInventoriesByProductIds(@RequestParam List<Long> productIds) {
+        return ResponseEntity.ok(ApiResponse.success(inventoryService.findByProductIds(productIds)));
     }
 
     @GetMapping("/by-ids")
     @Operation(summary = "[내부] 재고 ID 목록으로 재고 조회", description = "discount-service 전체 할인 목록 조회용")
-    public ResponseEntity<List<InventoryResponse>> getInventoriesByIds(@RequestParam List<Long> inventoryIds) {
-        return ResponseEntity.ok(inventoryService.findByIds(inventoryIds));
+    public ResponseEntity<ApiResponse<List<InventoryResponse>>> getInventoriesByIds(@RequestParam List<Long> inventoryIds) {
+        return ResponseEntity.ok(ApiResponse.success(inventoryService.findByIds(inventoryIds)));
     }
 }

@@ -51,11 +51,10 @@ public class InternalStoreController {
     /**
      * storeId 목록으로 매장 일괄 조회 (내부용).
      * discount-service에서 전체 할인 목록 조회 시 매장명 조회에 사용합니다.
-     * ApiResponse 미사용 — inventory/product internal API와 동일한 방식.
      */
     @GetMapping("/by-ids")
     @Operation(summary = "[내부] storeId 목록으로 매장 일괄 조회", description = "discount-service에서 매장명 일괄 조회용")
-    public ResponseEntity<List<StoreResponseDto>> getStoresByIds(@RequestParam List<Long> storeIds) {
-        return ResponseEntity.ok(storeService.getStoresByIds(storeIds));
+    public ResponseEntity<ApiResponse<List<StoreResponseDto>>> getStoresByIds(@RequestParam List<Long> storeIds) {
+        return ResponseEntity.ok(ApiResponse.success(storeService.getStoresByIds(storeIds)));
     }
 }

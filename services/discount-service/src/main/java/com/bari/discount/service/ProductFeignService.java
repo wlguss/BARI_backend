@@ -1,6 +1,7 @@
 package com.bari.discount.service;
 
 import com.bari.discount.config.FeignConfig;
+import com.bari.discount.dto.client.ApiResponseWrapper;
 import com.bari.discount.dto.client.ProductInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +17,8 @@ import java.util.List;
 public interface ProductFeignService {
 
     @GetMapping("/api/internal/products/by-stores")
-    List<ProductInfo> getProductsByStoreIds(@RequestParam List<Long> storeIds);
+    ApiResponseWrapper<List<ProductInfo>> getProductsByStoreIds(@RequestParam List<Long> storeIds);
 
-    // 여러 productId로 상품 조회 (전체 할인 목록용)
     @GetMapping("/api/internal/products/by-ids")
-    List<ProductInfo> getProductsByIds(@RequestParam List<Long> productIds);
+    ApiResponseWrapper<List<ProductInfo>> getProductsByIds(@RequestParam List<Long> productIds);
 }

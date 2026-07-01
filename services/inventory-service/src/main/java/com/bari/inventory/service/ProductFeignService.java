@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.bari.inventory.config.FeignConfig;
+import com.bari.inventory.dto.client.ApiResponseWrapper;
 import com.bari.inventory.dto.response.ProductCheckResponse;
 import com.bari.inventory.dto.response.StoreProductResponse;
 
@@ -15,9 +16,8 @@ import com.bari.inventory.dto.response.StoreProductResponse;
 public interface ProductFeignService {
 
     @GetMapping("/api/products/{productId}")
-    ProductCheckResponse getProduct(@PathVariable Long productId);
+    ApiResponseWrapper<ProductCheckResponse> getProduct(@PathVariable Long productId);
 
-    // 특정 매장의 상품 목록 조회 (매장 재고 전체 조회용)
     @GetMapping("/api/products")
-    List<StoreProductResponse> getProductsByStoreId(@RequestParam Long storeId);
+    ApiResponseWrapper<List<StoreProductResponse>> getProductsByStoreId(@RequestParam Long storeId);
 }

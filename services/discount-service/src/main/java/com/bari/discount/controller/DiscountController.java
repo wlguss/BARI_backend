@@ -1,7 +1,5 @@
 package com.bari.discount.controller;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,9 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.discount.dto.request.DiscountRequest;
 import com.bari.discount.service.DiscountService;
 
@@ -28,36 +26,36 @@ public class DiscountController {
 
     // RQ-4005 매장 기준 할인 전체 목록 조회
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<?> getDiscountsByStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(discountService.getDiscountsByStore(storeId));
+    public ResponseEntity<ApiResponse<?>> getDiscountsByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.getDiscountsByStore(storeId)));
     }
 
     // 상세 조회
     @GetMapping("/{inventoryId}")
-    public ResponseEntity<?> getDiscount(@PathVariable Long inventoryId) {
-        return ResponseEntity.ok(discountService.get(inventoryId));
+    public ResponseEntity<ApiResponse<?>> getDiscount(@PathVariable Long inventoryId) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.get(inventoryId)));
     }
 
     // 등록
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody DiscountRequest dto) {
+    public ResponseEntity<ApiResponse<Void>> create(@RequestBody DiscountRequest dto) {
         discountService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<Void>created(null));
     }
 
     // 수정
     @PutMapping("/{discountId}")
-    public ResponseEntity<?> update(
+    public ResponseEntity<ApiResponse<?>> update(
             @PathVariable Long discountId,
             @RequestBody DiscountRequest dto) {
 
-        return ResponseEntity.ok(discountService.update(discountId, dto));
+        return ResponseEntity.ok(ApiResponse.success(discountService.update(discountId, dto)));
     }
 
     // 삭제 (종료 + soft delete)
     @DeleteMapping("/{discountId}")
-    public ResponseEntity<?> delete(@PathVariable Long discountId) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long discountId) {
         discountService.delete(discountId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }
