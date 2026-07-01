@@ -65,14 +65,15 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
                 // Spring Security 권한명 규칙: "ROLE_" 접두사 필요
                 String authority = "ROLE_" + role;
 
-                // 3. SecurityContext에 인증 정보 설정
+                // 3. SecurityContext에 Authentication 설정
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 String.valueOf(userId),   // principal: userId (String)
                                 null,                     // credentials: null (헤더 기반이므로)
                                 List.of(new SimpleGrantedAuthority(authority))
                         );
-
+                
+                // SecurityContext에 인증 정보 설정
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("X-Header 인증 성공 - userId: {}, role: {}", userId, role);
 

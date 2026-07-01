@@ -51,13 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Spring Security 권한명 규칙: "ROLE_" 접두사 필요
                 String authority = "ROLE_" + role;
 
+                // 토큰 값을 추출해서 Authentication 객체 생성
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 String.valueOf(userId),   // principal: userId (String)
                                 null,                     // credentials: null (토큰 기반이므로)
                                 List.of(new SimpleGrantedAuthority(authority))
                         );
-
+                
+                // SecurityContext에 인증 정보 설정
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("JWT 인증 성공 - userId: {}, role: {}", userId, role);
 
