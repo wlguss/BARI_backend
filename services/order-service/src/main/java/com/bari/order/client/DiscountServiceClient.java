@@ -32,13 +32,14 @@ public class DiscountServiceClient {
      */
     public List<DiscountInfo> getActiveDiscounts(List<Long> inventoryIds) {
         try {
-            return discountRestClient.get()
+            ApiResponseWrapper<List<DiscountInfo>> response = discountRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/api/internal/discounts/active-by-inventories")
                             .queryParam("inventoryIds", inventoryIds.toArray())
                             .build())
                     .retrieve()
-                    .body(new ParameterizedTypeReference<List<DiscountInfo>>() {});
+                    .body(new ParameterizedTypeReference<ApiResponseWrapper<List<DiscountInfo>>>() {});
+            return response != null ? response.getData() : List.of();
         } catch (RestClientException e) {
             log.warn("discount-service 할인 조회 실패, 정가 적용 - inventoryIds: {}, error: {}", inventoryIds, e.getMessage());
             return List.of();

@@ -43,7 +43,7 @@ public class DiscountService {
         }
 
         try {
-            if (!inventoryFeignService.existsInventory(dto.getInventoryId())) {
+            if (!Boolean.TRUE.equals(inventoryFeignService.existsInventory(dto.getInventoryId()).getData())) {
                 throw new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND);
             }
         } catch (FeignException e) {
@@ -75,7 +75,7 @@ public class DiscountService {
 
         // 재고 존재 검증
         try {
-            if (!inventoryFeignService.existsInventory(inventoryId)) {
+            if (!Boolean.TRUE.equals(inventoryFeignService.existsInventory(inventoryId).getData())) {
                 throw new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND);
             }
         } catch (FeignException e) {
@@ -123,7 +123,7 @@ public class DiscountService {
     @Transactional(readOnly = true)
     public List<ExpiringDiscountResponse> getExpiringDiscountsByStoreIds(List<Long> storeIds) {
         // 1. storeIds → 상품 목록 조회
-        List<ProductInfo> products = productFeignService.getProductsByStoreIds(storeIds);
+        List<ProductInfo> products = productFeignService.getProductsByStoreIds(storeIds).getData();
         if (products.isEmpty()) {
             return List.of();
         }
@@ -134,7 +134,7 @@ public class DiscountService {
         List<Long> productIds = List.copyOf(productMap.keySet());
 
         // 3. productIds → 재고 목록 조회
-        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByProductIds(productIds);
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByProductIds(productIds).getData();
         if (inventories.isEmpty()) {
             return List.of();
         }
@@ -164,7 +164,7 @@ public class DiscountService {
     @Transactional(readOnly = true)
     public List<StoreDiscountResponse> getDiscountsByStore(Long storeId) {
         // 1. storeId → 해당 매장의 상품 목록 조회
-        List<ProductInfo> products = productFeignService.getProductsByStoreIds(List.of(storeId));
+        List<ProductInfo> products = productFeignService.getProductsByStoreIds(List.of(storeId)).getData();
         if (products.isEmpty()) {
             return List.of();
         }
@@ -175,7 +175,7 @@ public class DiscountService {
         List<Long> productIds = List.copyOf(productMap.keySet());
 
         // 3. productIds → 재고 목록 조회
-        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByProductIds(productIds);
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByProductIds(productIds).getData();
         if (inventories.isEmpty()) {
             return List.of();
         }
@@ -212,19 +212,19 @@ public class DiscountService {
                 .map(Discount::getInventoryId)
                 .distinct()
                 .toList();
-        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(inventoryIds);
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(inventoryIds).getData();
         Map<Long, Long> inventoryToProductId = inventories.stream()
                 .collect(Collectors.toMap(InventoryInfo::getId, InventoryInfo::getProductId));
 
         // 3. productId 목록 추출 → 상품 조회 (productId → ProductInfo 매핑)
         List<Long> productIds = inventoryToProductId.values().stream().distinct().toList();
-        List<ProductInfo> products = productFeignService.getProductsByIds(productIds);
+        List<ProductInfo> products = productFeignService.getProductsByIds(productIds).getData();
         Map<Long, ProductInfo> productMap = products.stream()
                 .collect(Collectors.toMap(ProductInfo::getId, p -> p));
 
         // 4. storeId 목록 추출 → 매장 조회 (storeId → StoreInfo 매핑)
         List<Long> storeIds = products.stream().map(ProductInfo::getStoreId).distinct().toList();
-        List<StoreInfo> stores = storeFeignService.getStoresByIds(storeIds);
+        List<StoreInfo> stores = storeFeignService.getStoresByIds(storeIds).getData();
         Map<Long, StoreInfo> storeMap = stores.stream()
                 .collect(Collectors.toMap(StoreInfo::getId, s -> s));
 
@@ -248,17 +248,17 @@ public class DiscountService {
                 .orElseThrow(() -> new BusinessException(DiscountErrorCode.DISCOUNT_NOT_FOUND));
 
         // 2. 재고 조회
-        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(List.of(discount.getInventoryId()));
+        List<InventoryInfo> inventories = inventoryFeignService.getInventoriesByIds(List.of(discount.getInventoryId())).getData();
         InventoryInfo inventory = inventories.stream().findFirst()
                 .orElseThrow(() -> new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND));
 
         // 3. 상품 조회
-        List<ProductInfo> products = productFeignService.getProductsByIds(List.of(inventory.getProductId()));
+        List<ProductInfo> products = productFeignService.getProductsByIds(List.of(inventory.getProductId())).getData();
         ProductInfo product = products.stream().findFirst()
                 .orElseThrow(() -> new BusinessException(DiscountErrorCode.INVENTORY_NOT_FOUND));
 
         // 4. 매장 조회
-        List<StoreInfo> stores = storeFeignService.getStoresByIds(List.of(product.getStoreId()));
+        List<StoreInfo> stores = storeFeignService.getStoresByIds(List.of(product.getStoreId())).getData();
         StoreInfo store = stores.stream().findFirst().orElse(null);
 
         return DiscountDetailResponse.of(discount, inventory, product, store);

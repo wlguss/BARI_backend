@@ -5,7 +5,7 @@ import com.bari.common.exception.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+@Getter    // 추상 메서드 getStatus(), getCode(), getMessage()를 구현한 enum에 대해 자동으로 getter 메서드를 생성합니다.
 @RequiredArgsConstructor
 public enum ProductErrorCode implements ErrorCode {
 

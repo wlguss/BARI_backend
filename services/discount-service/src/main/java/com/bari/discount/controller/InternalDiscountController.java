@@ -1,5 +1,6 @@
 package com.bari.discount.controller;
 
+import com.bari.common.response.ApiResponse;
 import com.bari.discount.dto.response.DiscountResponse;
 import com.bari.discount.dto.response.ExpiringDiscountResponse;
 import com.bari.discount.service.DiscountService;
@@ -37,8 +38,8 @@ public class InternalDiscountController {
      */
     @GetMapping("/expiring")
     @Operation(summary = "[내부] 찜한 매장 할인 임박 상품 조회", description = "store-service 홈화면 노출용 (내일 마감 기준)")
-    public ResponseEntity<List<ExpiringDiscountResponse>> getExpiringDiscounts(@RequestParam List<Long> storeIds) {
-        return ResponseEntity.ok(discountService.getExpiringDiscountsByStoreIds(storeIds));
+    public ResponseEntity<ApiResponse<List<ExpiringDiscountResponse>>> getExpiringDiscounts(@RequestParam List<Long> storeIds) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.getExpiringDiscountsByStoreIds(storeIds)));
     }
 
     /**
@@ -50,7 +51,7 @@ public class InternalDiscountController {
      */
     @GetMapping("/active-by-inventories")
     @Operation(summary = "[내부] 재고별 활성 할인 조회", description = "order-service 주문 가격 계산용")
-    public ResponseEntity<List<DiscountResponse>> getActiveDiscountsByInventoryIds(@RequestParam List<Long> inventoryIds) {
-        return ResponseEntity.ok(discountService.getActiveDiscountsByInventoryIds(inventoryIds));
+    public ResponseEntity<ApiResponse<List<DiscountResponse>>> getActiveDiscountsByInventoryIds(@RequestParam List<Long> inventoryIds) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.getActiveDiscountsByInventoryIds(inventoryIds)));
     }
 }

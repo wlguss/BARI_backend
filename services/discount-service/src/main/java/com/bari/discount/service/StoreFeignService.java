@@ -1,6 +1,7 @@
 package com.bari.discount.service;
 
 import com.bari.discount.config.FeignConfig;
+import com.bari.discount.dto.client.ApiResponseWrapper;
 import com.bari.discount.dto.client.StoreInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,5 +17,5 @@ import java.util.List;
 public interface StoreFeignService {
 
     @GetMapping("/api/internal/stores/by-ids")
-    List<StoreInfo> getStoresByIds(@RequestParam List<Long> storeIds);
+    ApiResponseWrapper<List<StoreInfo>> getStoresByIds(@RequestParam List<Long> storeIds);
 }

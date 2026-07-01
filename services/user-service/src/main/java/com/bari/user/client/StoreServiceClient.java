@@ -2,6 +2,7 @@ package com.bari.user.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -26,16 +27,17 @@ public class StoreServiceClient {
      */
     public StoreInfo getStoreByOwnerId(Long ownerId) {
         try {
-            return storeRestClient.get()
+            ApiResponseWrapper<StoreInfo> response = storeRestClient.get()
                     .uri("/api/internal/stores/owner/{ownerId}", ownerId)
                     .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                         log.warn("store-service 매장 조회 실패 - ownerId: {}", ownerId);
                     })
-                    .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                         log.error("store-service 서버 오류 - ownerId: {}", ownerId);
                     })
-                    .body(StoreInfo.class);
+                    .body(new ParameterizedTypeReference<ApiResponseWrapper<StoreInfo>>() {});
+            return response != null ? response.getData() : null;
         } catch (Exception e) {
             // 로그인 자체가 실패하면 안 되므로 store 조회 실패 시 null 반환
             log.warn("store-service 호출 실패 (로그인은 유지) - ownerId: {}, error: {}", ownerId, e.getMessage());
