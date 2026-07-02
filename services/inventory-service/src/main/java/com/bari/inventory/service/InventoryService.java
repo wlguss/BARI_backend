@@ -185,6 +185,7 @@ public class InventoryService {
         return exists;
     }
 
+    // 재고 차감 이벤트 수신 (order-service에서 발행)
     @KafkaListener(topics = "order.reserved")
     public void quantityConsumer(String message) {
         ObjectMapper objectMapper = new ObjectMapper();

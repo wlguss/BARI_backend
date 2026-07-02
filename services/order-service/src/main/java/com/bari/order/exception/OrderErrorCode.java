@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * order-service 전용 에러 코드.
  */
-@Getter
+@Getter // 선언된 필드의 getter 메서드를 자동으로 생성
 @RequiredArgsConstructor
 public enum OrderErrorCode implements ErrorCode {
 
@@ -29,6 +29,6 @@ public enum OrderErrorCode implements ErrorCode {
 
     @Override
     public String getCode() {
-        return this.name();
+        return this.name();  // enum의 이름을 코드로 사용  
     }
 }

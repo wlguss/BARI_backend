@@ -19,6 +19,7 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class StoreServiceClient {
 
+    // new를 사용하지 않고 Spring Bean으로 주입받도록 함 
     private final RestClient storeRestClient;
 
     /**

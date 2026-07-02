@@ -41,7 +41,7 @@ public class OrderService {
     private static final String TOPIC_ORDER_CANCELLED = "order.cancelled";
 
     private final OrderRepository orderRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate; // yml파일에 등록해주면 자동으로 스프링이 빈을 주입해줌
     private final ProductServiceClient productServiceClient;
     private final StoreServiceClient storeServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
@@ -122,7 +122,7 @@ public class OrderService {
                         .map(DiscountInfo::getOriginalPrice)
                         .findFirst()
                         .orElse(0));
-        int orderPrice = unitPrice * request.getQuantity();
+        int orderPrice = unitPrice * request.getQuantity(); 
 
         Order order = request.toEntity(customerId, product.getName(), store.getStoreName(), orderPrice);
         Order saved = orderRepository.save(order);
@@ -131,6 +131,7 @@ public class OrderService {
         kafkaTemplate.send(TOPIC_ORDER_RESERVED, String.valueOf(saved.getId()), OrderReservedEvent.from(saved));
         log.info("픽업 예약 완료 - orderId: {}, customerId: {}, storeId: {}", saved.getId(), customerId, saved.getStoreId());
 
+        // inventory-service 기다리지 않고 바로 반환 
         return OrderResponse.from(saved);
     }
 

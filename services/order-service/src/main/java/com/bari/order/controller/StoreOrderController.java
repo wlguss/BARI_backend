@@ -37,14 +37,6 @@ public class StoreOrderController {
 
     private final OrderService orderService;
 
-    @GetMapping("/store/{storeId}")
-    @Operation(summary = "매장 기준 전체 주문 목록 조회", description = "storeId로 해당 매장의 전체 주문 목록을 조회합니다. status 파라미터로 필터링 가능합니다.")
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByStoreId(
-            @PathVariable Long storeId,
-            @RequestParam(required = false) OrderStatus status) {
-        return ResponseEntity.ok(ApiResponse.success(orderService.getOrdersByStoreId(storeId, status)));
-    }
-
     @GetMapping
     @Operation(summary = "주문 목록 조회", description = "본인 매장의 주문 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<Page<OrderResponse>>> getStoreOrders(
