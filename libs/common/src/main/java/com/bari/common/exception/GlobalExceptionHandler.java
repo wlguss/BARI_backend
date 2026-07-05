@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @SpringBootApplication(scanBasePackages = "com.bari") 설정이 필요합니다.
  */
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice   
 public class GlobalExceptionHandler {
 
     /**

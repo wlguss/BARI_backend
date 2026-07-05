@@ -1,25 +1,19 @@
-FROM gradle:8.7-jdk17 AS builder
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /app
 
-
+COPY gradlew .
+COPY gradle gradle
 COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-COPY gradlew ./gradlew
+COPY libs libs
+COPY services/store-service/build.gradle services/store-service/build.gradle
 
+RUN chmod +x gradlew
+RUN ./gradlew :services:store-service:dependencies
 
-COPY libs ./libs
-COPY services ./services
+COPY services/store-service/src services/store-service/src
+RUN ./gradlew :services:store-service:bootJar -x test
 
-
-RUN chmod +x ./gradlew
-RUN sed -i 's/\r$//' ./gradlew
-
-
-RUN ./gradlew :services:store-service:bootJar --no-daemon --stacktrace --warning-mode all
-
-FROM eclipse-temurin:17-jdk
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/services/store-service/build/libs/*.jar app.jar

@@ -1,21 +1,19 @@
-FROM gradle:8.7-jdk17 AS builder
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /app
 
+COPY gradlew .
+COPY gradle gradle
 COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-COPY gradlew ./gradlew
+COPY libs libs
+COPY services/inventory-service/build.gradle services/inventory-service/build.gradle
 
-COPY libs ./libs
-COPY services ./services
+RUN chmod +x gradlew
+RUN ./gradlew :services:inventory-service:dependencies
 
-RUN chmod +x ./gradlew
-RUN sed -i 's/\r$//' ./gradlew
+COPY services/inventory-service/src services/inventory-service/src
+RUN ./gradlew :services:inventory-service:bootJar -x test
 
-RUN ./gradlew :services:inventory-service:bootJar --no-daemon --stacktrace --warning-mode all
-
-FROM eclipse-temurin:17-jdk
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/services/inventory-service/build/libs/*.jar app.jar

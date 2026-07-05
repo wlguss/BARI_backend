@@ -9,7 +9,8 @@
 
     "redhat.java", // Java 언어 지원 핵심 확장 (자동완성, 에러검출, 포맷팅, 디버깅 기반)
     "redhat.vscode-yaml", // YAML 파일 자동완성 및 검증 (application.yml 작성 시 필수)
-    "ms-azuretools.vscode-docker" // Docker 컨테이너/이미지 관리 및 로그 확인 (로컬 개발 환경 관리에 유용)
+    "ms-azuretools.vscode-docker",
+    "anthropic.claude-code" // Docker 컨테이너/이미지 관리 및 로그 확인 (로컬 개발 환경 관리에 유용)
 
     // "bierner.markdown-mermaid", // Markdown에서 Mermaid 다이어그램을 사용할 수 있게 해주는 확장
     // "exodiusstudios.comment-anchors", // 코드 내 주석을 쉽게 관리할 수 있게 해주는 확장

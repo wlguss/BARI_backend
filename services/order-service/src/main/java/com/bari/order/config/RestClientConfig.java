@@ -36,7 +36,7 @@ public class RestClientConfig {
     /**
      * store-service 전용 RestClient.
      */
-    @Bean
+    @Bean   // 의존성 주입을 위해 Spring Bean으로 등록
     public RestClient storeRestClient() {
         return RestClient.builder()
                 .baseUrl(storeServiceUrl)

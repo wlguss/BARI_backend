@@ -1,25 +1,23 @@
-FROM gradle:8.7-jdk17 AS builder
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /app
 
+COPY gradlew .
+COPY gradle gradle
 COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-COPY gradlew ./gradlew
+COPY libs libs
+COPY services/discount-service/build.gradle services/discount-service/build.gradle
 
-COPY libs ./libs
-COPY services ./services
+RUN chmod +x gradlew
+RUN ./gradlew :services:discount-service:dependencies
 
-RUN chmod +x ./gradlew
-RUN sed -i 's/\r$//' ./gradlew
+COPY services/discount-service/src services/discount-service/src
+RUN ./gradlew :services:discount-service:bootJar -x test
 
-RUN ./gradlew :services:discount-service:bootJar --no-daemon --stacktrace --warning-mode all
-
-FROM eclipse-temurin:17-jdk
-
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/services/discount-service/build/libs/*.jar app.jar
 
-EXPOSE 8083
+EXPOSE 8085
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

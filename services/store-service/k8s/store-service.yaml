@@ -8,6 +8,6 @@ spec:
     app: store-service
   ports:
     - protocol: TCP
-      port: 8082        
-      targetPort: 8082  
+      port: 8082
+      targetPort: 8082
   type: ClusterIP
