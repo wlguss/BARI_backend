@@ -1,0 +1,29 @@
+language: "ko-KR"
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!**/build/**"
+    - "!**/bin/**"
+    - "!**/*.class"
+    - "!gradle/**"
+    - "!gradlew"
+    - "!gradlew.bat"
+  path_instructions:
+    - path: "services/**/src/main/java/**/*.java"
+      instructions: >
+        Spring Boot 마이크로서비스 코드입니다. 서비스 간 REST API 계약이나
+        Kafka 이벤트 스키마가 바뀌는 경우 하위 호환성 문제를 우선적으로 지적해주세요.
+    - path: "**/k8s/**/*.yaml"
+      instructions: >
+        Kubernetes 매니페스트입니다. namespace, port(Service의 port/targetPort),
+        Ingress backend가 실제 참조 대상과 일치하는지, 그리고 서비스 간 namespace
+        의존성이 새로 생기지 않는지 확인해주세요.
+
+chat:
+  auto_reply: true
