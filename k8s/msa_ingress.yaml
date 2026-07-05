@@ -9,13 +9,13 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
   ingressClassName: alb
-  rules:
+  rules: # 무엇을 어디로 보낼지 정의
     - http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: Prefix  # path + pathType: /로 시작하는 모든 경로
             backend:
               service:
-                name: api-gateway
+                name: api-gateway # 매칭되는 요청은 backend.service.name: api-gateway, port 80으로 전달
                 port:
                   number: 80
