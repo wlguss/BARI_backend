@@ -74,7 +74,7 @@ spec:
                   key: JWT_SECRET
 
             - name: REDIS_HOST
-              value: "redis"
+              value: "redis.redis.svc.cluster.local"
 
             - name: REDIS_PORT
               value: "6379"

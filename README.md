@@ -39,7 +39,7 @@ bari-backend/
 ├── k8s/                         # 공통 k8s 리소스
 │   ├── msa_kafka.yaml           # Kafka Deployment + Service (kafka 네임스페이스)
 │   ├── msa_zookeeper.yaml       # Zookeeper Deployment + Service
-│   ├── msa_redis.yaml           # Redis Deployment + Service
+│   ├── msa_redis.yaml           # Redis Deployment + Service (redis 네임스페이스)
 │   └── msa_ingress.yaml         # ALB Ingress (gateway 네임스페이스)
 ├── .github/
 │   └── workflows/
@@ -350,7 +350,7 @@ curl -H "X-User-Id: 1" -H "X-User-Role: USER" http://localhost:8082/api/stores
 
 ```
 gateway / user-service / store-service / product-service
-inventory-service / discount-service / order-service / kafka
+inventory-service / discount-service / order-service / kafka / redis
 ```
 
 ### 공통 인프라 배포 순서
