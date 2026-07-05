@@ -4,9 +4,9 @@ metadata:
   name: order-service
   namespace: order-service
 spec:
-  type: ClusterIP
+  type: ClusterIP  # 클러스터 내부에서만 접근 가능한 가상 IP를 가진 서비스
   selector:
     app: order-service
   ports:
-    - port: 8086
-      targetPort: 8086
+    - port: 8086  # 자신이 클러스터 내부에 노출하는 포트 
+      targetPort: 8086  # 실제 pod가 리스닝하고 있는 포트 

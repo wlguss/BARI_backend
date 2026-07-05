@@ -6,7 +6,7 @@ metadata:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata:
+metadata:   # DNS 주소 자동 생성 -> 'order-service.order-service.svc.cluster.local'
   name: order-service
   namespace: order-service
 spec:
