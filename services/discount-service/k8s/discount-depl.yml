@@ -66,30 +66,30 @@ spec:
             - name: PRODUCT_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: PRODUCT_SERVICE_HOST
             - name: PRODUCT_SERVICE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: PRODUCT_SERVICE_PORT
             - name: INVENTORY_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: INVENTORY_SERVICE_HOST
             - name: INVENTORY_SERVICE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: INVENTORY_SERVICE_PORT
             - name: STORE_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: STORE_SERVICE_HOST
             - name: STORE_SERVICE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: discount-service-secret
+                  name: bari-app-secrets
                   key: STORE_SERVICE_PORT

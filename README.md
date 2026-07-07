@@ -40,7 +40,7 @@ bari-backend/
 │   ├── msa_kafka.yaml           # Kafka Deployment + Service (kafka 네임스페이스)
 │   ├── msa_zookeeper.yaml       # Zookeeper Deployment + Service
 │   ├── msa_redis.yaml           # Redis Deployment + Service (redis 네임스페이스)
-│   └── msa_ingress.yaml         # ALB Ingress (gateway 네임스페이스)
+│   └── msa_ingress.yaml         # nginx Ingress (gateway 네임스페이스)
 ├── .github/
 │   └── workflows/
 │       ├── deploy-service.yml          # 실제 빌드/배포 로직 (재사용 워크플로우)
@@ -353,8 +353,9 @@ k8s 매니페스트만으로는 안 되고, 아래가 이미 준비되어 있어
 
 - **EKS 클러스터** (`aws eks update-kubeconfig`로 로컬 kubectl 연결)
 - **ECR 리포지토리** 7개 (서비스별 1개, `260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/{서비스명}`)
-- **RDS(MariaDB)** — 각 서비스 Secret의 `DB_HOST`가 가리키는 인스턴스
-- **AWS Load Balancer Controller** — [msa_ingress.yaml](k8s/msa_ingress.yaml)의 `alb.ingress.kubernetes.io/*` 애노테이션을 실제 ALB로 변환해주는 컨트롤러. 이게 클러스터에 설치되어 있지 않으면 Ingress를 apply해도 ALB가 생성되지 않는다.
+- **RDS(MariaDB)** — 각 네임스페이스의 `bari-app-secrets`가 가리키는 인스턴스
+- **nginx ingress controller** (Helm 차트 `ingress-nginx/ingress-nginx`) — [msa_ingress.yaml](k8s/msa_ingress.yaml)의 `ingressClassName: nginx`를 실제로 처리해주는 컨트롤러. `controller.service.type=LoadBalancer` + `service.beta.kubernetes.io/aws-load-balancer-type: nlb` 어노테이션으로 설치하면 이 컨트롤러 앞단에 AWS NLB가 자동 생성된다. 이게 없으면 Ingress를 apply해도 아무 로드밸런서도 생기지 않는다.
+- **워커 노드 보안그룹** — NLB → 노드 NodePort로 트래픽이 전달되므로, 노드 보안그룹에 NodePort 대역(`30000-32767`) 인바운드가 열려있어야 한다.
 
 ### 네임스페이스 구성
 
@@ -389,34 +390,98 @@ kubectl apply -f k8s/msa_kafka.yaml       # zookeeper.kafka.svc.cluster.local �
 kubectl apply -f k8s/msa_redis.yaml       # redis 네임스페이스
 ```
 
-Ingress(ALB)는 api-gateway가 떠 있어야 의미가 있으므로 맨 마지막(5번)에 적용한다.
+Ingress(nginx)는 api-gateway가 떠 있어야 의미가 있으므로 맨 마지막(5번)에 적용한다.
 
-### 3. ⚠️ 공통 DB Secret(`bari-app-secrets`) 수동 생성 — git에 없는 부분
+### 3. ⚠️ 공통 Secret(`bari-app-secrets`) 수동 생성 — git에 없는 부분
 
-`user-service`, `product-service`, `inventory-service`, `discount-service`, `order-service`의 Deployment는
-`bari-app-secrets`(DB_HOST/DB_PORT/DB_NAME/DB_USERNAME/DB_PASSWORD, JWT_SECRET)라는 Secret을 참조하는데,
-DB 자격증명을 git에 올리지 않기 위해 **이 Secret을 만드는 yaml은 레포에 커밋되어 있지 않다.**
-(반대로 `store-service`는 [store-secret.yaml](services/store-service/k8s/store-secret.yaml)에 평문으로 커밋되어 있어 예외적으로 바로 apply하면 된다.)
-
-따라서 아래 5개 네임스페이스에 **먼저** 동일한 이름의 Secret을 수동으로 만들어야 한다. 안 만들면 Pod가 `CreateContainerConfigError`로 멈춘다.
+7개 서비스 전부 `bari-app-secrets`라는 **동일한 이름**의 Secret을 참조한다(DB 자격증명·JWT 서명키를 git에 올리지 않기 위해, 이 Secret을 만드는 yaml은 레포에 커밋되어 있지 않다). Secret은 네임스페이스 스코프라 **7개 네임스페이스 각각에** 만들어야 하고, 서비스마다 참조하는 키가 다르므로(내부 서비스 디스커버리용 `_HOST`/`_PORT`, Kafka 부트스트랩 주소가 서비스별로 다름) 네임스페이스별로 넣는 값도 다르다. 안 만들면 Pod가 `CreateContainerConfigError`로 멈춘다.
 
 ```bash
-for ns in user-service product-service inventory-service discount-service order-service; do
+# 공통값
+ENDPOINT='<RDS 엔드포인트>'
+DB_PW='<RDS 비밀번호>'
+JWT='bari-super-secret-key-must-be-at-least-32-chars'
+
+# user-service, product-service — DB + JWT만
+for ns in user-service product-service; do
   kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
-  kubectl create secret generic bari-app-secrets \
-    --namespace "$ns" \
-    --from-literal=DB_HOST=bari.cxwsg8yu0rtk.ap-northeast-2.rds.amazonaws.com \
-    --from-literal=DB_PORT=3306 \
-    --from-literal=DB_NAME=bari \
-    --from-literal=DB_USERNAME=bari \
-    --from-literal=DB_PASSWORD='<실제 RDS 비밀번호>' \
-    --from-literal=JWT_SECRET='bari-super-secret-key-must-be-at-least-32-chars'
+  kubectl create secret generic bari-app-secrets -n "$ns" \
+    --from-literal=DB_HOST="$ENDPOINT" --from-literal=DB_PORT=3306 \
+    --from-literal=DB_NAME=bari --from-literal=DB_USERNAME=bari \
+    --from-literal=DB_PASSWORD="$DB_PW" --from-literal=JWT_SECRET="$JWT"
 done
+
+# store-service — DB + JWT + discount-service 참조
+kubectl create namespace store-service --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic bari-app-secrets -n store-service \
+  --from-literal=DB_HOST="$ENDPOINT" --from-literal=DB_PORT=3306 \
+  --from-literal=DB_NAME=bari --from-literal=DB_USERNAME=bari \
+  --from-literal=DB_PASSWORD="$DB_PW" --from-literal=JWT_SECRET="$JWT" \
+  --from-literal=DISCOUNT_SERVICE_HOST=discount-service.discount-service.svc.cluster.local \
+  --from-literal=DISCOUNT_SERVICE_PORT=8085
+
+# inventory-service — DB + JWT + Kafka + product-service 참조
+kubectl create namespace inventory-service --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic bari-app-secrets -n inventory-service \
+  --from-literal=DB_HOST="$ENDPOINT" --from-literal=DB_PORT=3306 \
+  --from-literal=DB_NAME=bari --from-literal=DB_USERNAME=bari \
+  --from-literal=DB_PASSWORD="$DB_PW" --from-literal=JWT_SECRET="$JWT" \
+  --from-literal=KAFKA_BOOTSTRAP_SERVERS=kafka.kafka.svc.cluster.local:9092 \
+  --from-literal=PRODUCT_SERVICE_HOST=product-service.product-service.svc.cluster.local \
+  --from-literal=PRODUCT_SERVICE_PORT=8083
+
+# discount-service — DB + JWT + product/inventory/store 참조
+kubectl create namespace discount-service --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic bari-app-secrets -n discount-service \
+  --from-literal=DB_HOST="$ENDPOINT" --from-literal=DB_PORT=3306 \
+  --from-literal=DB_NAME=bari --from-literal=DB_USERNAME=bari \
+  --from-literal=DB_PASSWORD="$DB_PW" --from-literal=JWT_SECRET="$JWT" \
+  --from-literal=PRODUCT_SERVICE_HOST=product-service.product-service.svc.cluster.local \
+  --from-literal=PRODUCT_SERVICE_PORT=8083 \
+  --from-literal=INVENTORY_SERVICE_HOST=inventory-service.inventory-service.svc.cluster.local \
+  --from-literal=INVENTORY_SERVICE_PORT=8084 \
+  --from-literal=STORE_SERVICE_HOST=store-service.store-service.svc.cluster.local \
+  --from-literal=STORE_SERVICE_PORT=8082
+
+# order-service — DB + JWT + Kafka + store/product/inventory/discount 참조
+kubectl create namespace order-service --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic bari-app-secrets -n order-service \
+  --from-literal=DB_HOST="$ENDPOINT" --from-literal=DB_PORT=3306 \
+  --from-literal=DB_NAME=bari --from-literal=DB_USERNAME=bari \
+  --from-literal=DB_PASSWORD="$DB_PW" --from-literal=JWT_SECRET="$JWT" \
+  --from-literal=KAFKA_BOOTSTRAP_SERVERS=kafka.kafka.svc.cluster.local:9092 \
+  --from-literal=STORE_SERVICE_HOST=store-service.store-service.svc.cluster.local \
+  --from-literal=STORE_SERVICE_PORT=8082 \
+  --from-literal=PRODUCT_SERVICE_HOST=product-service.product-service.svc.cluster.local \
+  --from-literal=PRODUCT_SERVICE_PORT=8083 \
+  --from-literal=INVENTORY_SERVICE_HOST=inventory-service.inventory-service.svc.cluster.local \
+  --from-literal=INVENTORY_SERVICE_PORT=8084 \
+  --from-literal=DISCOUNT_SERVICE_HOST=discount-service.discount-service.svc.cluster.local \
+  --from-literal=DISCOUNT_SERVICE_PORT=8085
+
+# gateway — JWT만(DB 접근 없음) + 6개 서비스 전부 참조
+kubectl create namespace gateway --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic bari-app-secrets -n gateway \
+  --from-literal=JWT_SECRET="$JWT" \
+  --from-literal=STORE_SERVICE_HOST=store-service.store-service.svc.cluster.local \
+  --from-literal=STORE_SERVICE_PORT=8082 \
+  --from-literal=PRODUCT_SERVICE_HOST=product-service.product-service.svc.cluster.local \
+  --from-literal=PRODUCT_SERVICE_PORT=8083 \
+  --from-literal=INVENTORY_SERVICE_HOST=inventory-service.inventory-service.svc.cluster.local \
+  --from-literal=INVENTORY_SERVICE_PORT=8084 \
+  --from-literal=USER_SERVICE_HOST=user-service.user-service.svc.cluster.local \
+  --from-literal=USER_SERVICE_PORT=8081 \
+  --from-literal=DISCOUNT_SERVICE_HOST=discount-service.discount-service.svc.cluster.local \
+  --from-literal=DISCOUNT_SERVICE_PORT=8085 \
+  --from-literal=ORDER_SERVICE_HOST=order-service.order-service.svc.cluster.local \
+  --from-literal=ORDER_SERVICE_PORT=8086
 ```
+
+`kubectl create secret`은 멱등하지 않으므로, 값을 잘못 넣어 재실행해야 하면 `kubectl delete secret bari-app-secrets -n <네임스페이스>`로 먼저 지우고 다시 만든다.
 
 ### 4. 서비스 배포 (의존관계 순서)
 
-서비스 간 RestClient/OpenFeign 호출 대상이 먼저 떠 있도록 아래 순서로 apply한다. 각 서비스는 `{서비스별 Secret} → Deployment → Service` 순.
+서비스 간 RestClient/OpenFeign 호출 대상이 먼저 떠 있도록 아래 순서로 apply한다. `bari-app-secrets`는 3번에서 이미 네임스페이스별로 만들어 둔 상태이므로, 여기서는 `Deployment → Service` 순으로만 적용한다.
 
 ```bash
 # 4-1) user-service — 다른 서비스에 의존하지 않음
@@ -428,51 +493,46 @@ kubectl apply -f services/product-service/k8s/product-depl.yaml
 kubectl apply -f services/product-service/k8s/product-service.yaml
 
 # 4-3) store-service, inventory-service — product-service를 참조
-kubectl apply -f services/store-service/k8s/store-secret.yaml
 kubectl apply -f services/store-service/k8s/store-depl.yaml
 kubectl apply -f services/store-service/k8s/store-service.yaml
 
-kubectl apply -f services/inventory-service/k8s/inventory-secret.yaml
 kubectl apply -f services/inventory-service/k8s/inventory-depl.yml
 kubectl apply -f services/inventory-service/k8s/inventory-service.yml
 
 # 4-4) discount-service — product, inventory, store를 참조
-kubectl apply -f services/discount-service/k8s/discount-secret.yml
 kubectl apply -f services/discount-service/k8s/discount-depl.yml
 kubectl apply -f services/discount-service/k8s/discount-service.yml
 
 # 4-5) order-service — store, product, inventory, discount를 모두 참조
-kubectl apply -f services/order-service/k8s/order-secret.yml
 kubectl apply -f services/order-service/k8s/order-depl.yml
 kubectl apply -f services/order-service/k8s/order-service.yml
 
 # 4-6) api-gateway — 전 서비스의 단일 진입점, 항상 마지막
-kubectl apply -f services/api-gateway/k8s/apigateway-secret.yaml
 kubectl apply -f services/api-gateway/k8s/apigateway-depl.yaml
 kubectl apply -f services/api-gateway/k8s/apigateway-service.yaml
 ```
 
-### 5. Ingress(ALB) 연결
+### 5. Ingress(nginx) 연결
 
 ```bash
 kubectl apply -f k8s/msa_ingress.yaml
 ```
 
-`gateway` 네임스페이스에 `api-gateway` Service가 이미 있어야 라우팅이 성립하므로, 4-6번 이후에 적용한다.
+`gateway` 네임스페이스에 `api-gateway` Service가 이미 있어야 라우팅이 성립하므로, 4-6번 이후에 적용한다. nginx ingress controller는 Ingress마다 새 로드밸런서를 만들지 않고, 컨트롤러 설치 시 이미 떠 있는 하나의 NLB를 재사용한다.
 
 ### 6. 배포 확인
 
 ```bash
 kubectl get pods -A                                # 전체 네임스페이스 Pod 상태 확인
-kubectl get ingress -n gateway                      # ALB 주소(ADDRESS) 확인
+kubectl get ingress -n gateway                      # LoadBalancer 주소(ADDRESS) 확인
 kubectl logs -n order-service -l app=order-service  # 서비스별 로그
 kubectl describe pod -n user-service <pod-name>     # CreateContainerConfigError 등 트러블슈팅
 ```
 
-ALB 주소가 뜨면 외부에서 헬스체크:
+주소가 뜨면 외부에서 헬스체크:
 
 ```bash
-curl http://<ALB주소>/actuator/health
+curl http://<LoadBalancer 주소>/actuator/health
 ```
 
 ### 서비스 간 k8s DNS
@@ -483,7 +543,7 @@ curl http://<ALB주소>/actuator/health
     kafka.kafka.svc.cluster.local
 ```
 
-각 서비스 Secret(`*-service-secret.yaml`)에 다른 서비스의 `_HOST`/`_PORT`가 이 DNS 규칙으로 미리 박혀 있다.
+각 네임스페이스의 `bari-app-secrets`에 다른 서비스의 `_HOST`/`_PORT`가 이 DNS 규칙으로 미리 박혀 있다.
 
 ---
 

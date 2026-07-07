@@ -66,15 +66,15 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: KAFKA_BOOTSTRAP_SERVERS
             - name: PRODUCT_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: PRODUCT_SERVICE_HOST
             - name: PRODUCT_SERVICE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: inventory-service-secret
+                  name: bari-app-secrets
                   key: PRODUCT_SERVICE_PORT
