@@ -41,10 +41,6 @@ bari-backend/
 │   ├── msa_zookeeper.yaml       # Zookeeper Deployment + Service
 │   ├── msa_redis.yaml           # Redis Deployment + Service (redis 네임스페이스)
 │   └── msa_ingress.yaml         # ALB Ingress (gateway 네임스페이스)
-├── .github/
-│   └── workflows/
-│       ├── deploy-order-service.yml   # order-service CI/CD
-│       └── deploy-api-gateway.yml     # api-gateway CI/CD
 ├── postman/
 │   └── bari-backend.collection.json   # Postman 컬렉션 (전체 API)
 ├── libs/                        # 공유 라이브러리 모듈
@@ -110,13 +106,13 @@ bari-backend/
 | 서비스            | 로컬 포트    | k8s 컨테이너 포트 | 설명                                  |
 | ----------------- | ------------ | ----------------- | ------------------------------------- |
 | api-gateway       | 8080         | 8080              | 단일 진입점 (모든 외부 요청은 여기로) |
-| user-service      | 8081         | 8080              | 사용자 인증 서비스                    |
-| store-service     | 8082         | 8080              | 스토어 서비스                         |
-| product-service   | 8083         | 8080              | 상품 서비스                           |
-| inventory-service | 8084         | 8080              | 재고 서비스                           |
-| discount-service  | 8085         | 8080              | 할인 서비스                           |
-| order-service     | 8086         | 8080              | 주문 서비스                           |
-| item-service      | 8087         | 8080              | 아이템 서비스 (팀원 예시)             |
+| user-service      | 8081         | 8081              | 사용자 인증 서비스                    |
+| store-service     | 8082         | 8082              | 스토어 서비스                         |
+| product-service   | 8083         | 8083              | 상품 서비스                           |
+| inventory-service | 8084         | 8084              | 재고 서비스                           |
+| discount-service  | 8085         | 8085              | 할인 서비스                           |
+| order-service     | 8086         | 8086              | 주문 서비스                           |
+| item-service      | 8087         | -                  | 아이템 서비스 (팀원 예시, k8s 미배포) |
 | MariaDB           | 3306         | -                 | 데이터베이스                          |
 | Redis             | 6379         | -                 | Refresh Token 저장소                  |
 | Kafka             | 9092         | -                 | 메시지 브로커                         |
@@ -344,44 +340,135 @@ curl -H "X-User-Id: 1" -H "X-User-Role: USER" http://localhost:8082/api/stores
 
 ## k8s 배포
 
+현재는 **전부 수동 배포**(kubectl 직접 실행) 상태이며, GitHub Actions 등 CI/CD 자동화는 아직 붙어 있지 않다.
+아래 순서를 위에서부터 그대로 따라가면 클러스터에 처음부터 전체 스택을 올릴 수 있다.
+
+### 0. 배포 전 인프라 전제조건
+
+k8s 매니페스트만으로는 안 되고, 아래가 이미 준비되어 있어야 한다:
+
+- **EKS 클러스터** (`aws eks update-kubeconfig`로 로컬 kubectl 연결)
+- **ECR 리포지토리** 7개 (서비스별 1개, `260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/{서비스명}`)
+- **RDS(MariaDB)** — 각 서비스 Secret의 `DB_HOST`가 가리키는 인스턴스
+- **AWS Load Balancer Controller** — [msa_ingress.yaml](k8s/msa_ingress.yaml)의 `alb.ingress.kubernetes.io/*` 애노테이션을 실제 ALB로 변환해주는 컨트롤러. 이게 클러스터에 설치되어 있지 않으면 Ingress를 apply해도 ALB가 생성되지 않는다.
+
 ### 네임스페이스 구성
 
-각 서비스는 독립된 네임스페이스를 사용합니다:
+각 서비스는 독립된 네임스페이스를 사용하며, 서비스별 `*-depl.yaml`(또는 `*-depl.yml`)에 `Namespace` 리소스가 같이 정의되어 있어 apply 시 자동 생성된다.
 
 ```
 gateway / user-service / store-service / product-service
 inventory-service / discount-service / order-service / kafka / redis
 ```
 
-### 공통 인프라 배포 순서
+### 1. 이미지 빌드 & ECR 푸시
+
+각 서비스 `Dockerfile`은 gradle 빌드 → jre-alpine 실행의 멀티스테이지 빌드로 되어 있다. 리포지토리 루트에서 서비스별로 반복:
 
 ```bash
-# 1. Zookeeper
-kubectl apply -f k8s/msa_zookeeper.yaml
+aws ecr get-login-password --region ap-northeast-2 \
+  | docker login --username AWS --password-stdin 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com
 
-# 2. Kafka
-kubectl apply -f k8s/msa_kafka.yaml
+docker build -f services/user-service/Dockerfile \
+  -t 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/user-service:latest .
+docker push 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/user-service:latest
+```
 
-# 3. Redis
-kubectl apply -f k8s/msa_redis.yaml
+`api-gateway, store-service, product-service, inventory-service, discount-service, order-service`도 동일하게 반복한다.
+(`item-service`는 k8s 매니페스트가 없는 팀원 예시 코드라 배포 대상이 아니다.)
 
-# 4. Ingress (ALB)
+### 2. 공통 인프라 배포
+
+```bash
+kubectl apply -f k8s/msa_zookeeper.yaml   # kafka 네임스페이스 생성 + Zookeeper
+kubectl apply -f k8s/msa_kafka.yaml       # zookeeper.kafka.svc.cluster.local 에 의존
+kubectl apply -f k8s/msa_redis.yaml       # redis 네임스페이스
+```
+
+Ingress(ALB)는 api-gateway가 떠 있어야 의미가 있으므로 맨 마지막(5번)에 적용한다.
+
+### 3. ⚠️ 공통 DB Secret(`bari-app-secrets`) 수동 생성 — git에 없는 부분
+
+`user-service`, `product-service`, `inventory-service`, `discount-service`, `order-service`의 Deployment는
+`bari-app-secrets`(DB_HOST/DB_PORT/DB_NAME/DB_USERNAME/DB_PASSWORD, JWT_SECRET)라는 Secret을 참조하는데,
+DB 자격증명을 git에 올리지 않기 위해 **이 Secret을 만드는 yaml은 레포에 커밋되어 있지 않다.**
+(반대로 `store-service`는 [store-secret.yaml](services/store-service/k8s/store-secret.yaml)에 평문으로 커밋되어 있어 예외적으로 바로 apply하면 된다.)
+
+따라서 아래 5개 네임스페이스에 **먼저** 동일한 이름의 Secret을 수동으로 만들어야 한다. 안 만들면 Pod가 `CreateContainerConfigError`로 멈춘다.
+
+```bash
+for ns in user-service product-service inventory-service discount-service order-service; do
+  kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
+  kubectl create secret generic bari-app-secrets \
+    --namespace "$ns" \
+    --from-literal=DB_HOST=bari.cxwsg8yu0rtk.ap-northeast-2.rds.amazonaws.com \
+    --from-literal=DB_PORT=3306 \
+    --from-literal=DB_NAME=bari \
+    --from-literal=DB_USERNAME=bari \
+    --from-literal=DB_PASSWORD='<실제 RDS 비밀번호>' \
+    --from-literal=JWT_SECRET='bari-super-secret-key-must-be-at-least-32-chars'
+done
+```
+
+### 4. 서비스 배포 (의존관계 순서)
+
+서비스 간 RestClient/OpenFeign 호출 대상이 먼저 떠 있도록 아래 순서로 apply한다. 각 서비스는 `{서비스별 Secret} → Deployment → Service` 순.
+
+```bash
+# 4-1) user-service — 다른 서비스에 의존하지 않음
+kubectl apply -f services/user-service/k8s/user-depl.yaml
+kubectl apply -f services/user-service/k8s/user-service.yaml
+
+# 4-2) product-service — bari-app-secrets만 사용(envFrom), 다른 의존 없음
+kubectl apply -f services/product-service/k8s/product-depl.yaml
+kubectl apply -f services/product-service/k8s/product-service.yaml
+
+# 4-3) store-service, inventory-service — product-service를 참조
+kubectl apply -f services/store-service/k8s/store-secret.yaml
+kubectl apply -f services/store-service/k8s/store-depl.yaml
+kubectl apply -f services/store-service/k8s/store-service.yaml
+
+kubectl apply -f services/inventory-service/k8s/inventory-secret.yaml
+kubectl apply -f services/inventory-service/k8s/inventory-depl.yml
+kubectl apply -f services/inventory-service/k8s/inventory-service.yml
+
+# 4-4) discount-service — product, inventory, store를 참조
+kubectl apply -f services/discount-service/k8s/discount-secret.yml
+kubectl apply -f services/discount-service/k8s/discount-depl.yml
+kubectl apply -f services/discount-service/k8s/discount-service.yml
+
+# 4-5) order-service — store, product, inventory, discount를 모두 참조
+kubectl apply -f services/order-service/k8s/order-secret.yml
+kubectl apply -f services/order-service/k8s/order-depl.yml
+kubectl apply -f services/order-service/k8s/order-service.yml
+
+# 4-6) api-gateway — 전 서비스의 단일 진입점, 항상 마지막
+kubectl apply -f services/api-gateway/k8s/apigateway-secret.yaml
+kubectl apply -f services/api-gateway/k8s/apigateway-depl.yaml
+kubectl apply -f services/api-gateway/k8s/apigateway-service.yaml
+```
+
+### 5. Ingress(ALB) 연결
+
+```bash
 kubectl apply -f k8s/msa_ingress.yaml
 ```
 
-### 서비스 배포 예시 (order-service)
+`gateway` 네임스페이스에 `api-gateway` Service가 이미 있어야 라우팅이 성립하므로, 4-6번 이후에 적용한다.
+
+### 6. 배포 확인
 
 ```bash
-# Secret 생성
-kubectl apply -f services/order-service/k8s/order-secret.yaml
+kubectl get pods -A                                # 전체 네임스페이스 Pod 상태 확인
+kubectl get ingress -n gateway                      # ALB 주소(ADDRESS) 확인
+kubectl logs -n order-service -l app=order-service  # 서비스별 로그
+kubectl describe pod -n user-service <pod-name>     # CreateContainerConfigError 등 트러블슈팅
+```
 
-# Deployment + Service 배포
-kubectl apply -f services/order-service/k8s/order-depl.yaml
-kubectl apply -f services/order-service/k8s/order-service.yaml
+ALB 주소가 뜨면 외부에서 헬스체크:
 
-# 배포 상태 확인
-kubectl get pods -n order-service
-kubectl logs -n order-service -l app=order-service
+```bash
+curl http://<ALB주소>/actuator/health
 ```
 
 ### 서비스 간 k8s DNS
@@ -392,14 +479,7 @@ kubectl logs -n order-service -l app=order-service
     kafka.kafka.svc.cluster.local
 ```
 
-### CI/CD (GitHub Actions)
-
-`dev` 브랜치에 push 시 경로 기반으로 해당 서비스의 워크플로우가 트리거됩니다:
-
-| 워크플로우                  | 트리거 경로                            |
-| --------------------------- | -------------------------------------- |
-| `deploy-order-service.yml`  | `services/order-service/**`, `libs/**` |
-| `deploy-api-gateway.yml`    | `services/api-gateway/**`              |
+각 서비스 Secret(`*-service-secret.yaml`)에 다른 서비스의 `_HOST`/`_PORT`가 이 DNS 규칙으로 미리 박혀 있다.
 
 ---
 
