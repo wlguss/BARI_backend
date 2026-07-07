@@ -1,6 +1,6 @@
 name: Deploy product-service
 
-on:
+on:    # Trigger 
   push:
     branches: [dev]
     paths:
@@ -14,7 +14,7 @@ concurrency:
   group: deploy-product-service
   cancel-in-progress: false
 
-jobs:
+jobs:  # workflow 안에서 실행되는 작업 단위
   deploy:
     uses: ./.github/workflows/deploy-service.yml
     with:

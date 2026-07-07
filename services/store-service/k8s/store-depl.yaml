@@ -39,40 +39,40 @@ spec:
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DB_HOST
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DB_PORT
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DB_NAME
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DB_USERNAME
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DB_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: JWT_SECRET
             - name: DISCOUNT_SERVICE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DISCOUNT_SERVICE_HOST
             - name: DISCOUNT_SERVICE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: store-service-secret
+                  name: bari-app-secrets
                   key: DISCOUNT_SERVICE_PORT
