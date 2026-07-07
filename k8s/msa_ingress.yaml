@@ -3,12 +3,8 @@ kind: Ingress
 metadata:
   name: api-gateway-ingress
   namespace: gateway # Ingress가 라우팅할 수 있는 namespace를 지정(api-gateway 서비스가 있는 namespace)
-  annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'  # ALB가 수신할 포트 지정, 인터넷 쪽에서 열어두는 포트 
 spec:
-  ingressClassName: alb
+  ingressClassName: nginx
   rules: # 무엇을 어디로 보낼지 정의, 클러스터 내부로 넘겨주는 포트 
     - http:
         paths:
