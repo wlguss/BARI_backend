@@ -1,0 +1,75 @@
+name: Deploy Service (Reusable)
+
+# 이 워크플로우는 직접 실행되지 않고, 서비스별 deploy-*.yml 워크플로우가
+# "uses:"로 호출해서 사용하는 공용 빌드/배포 로직이다.
+# 7개 서비스의 build → push → deploy 절차가 완전히 동일하기 때문에
+# 로직은 여기 한 곳에만 두고, 서비스별 이름/네임스페이스만 입력으로 받는다.
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        description: "서비스 디렉터리명. ECR 레포명 / k8s Deployment명 / 컨테이너명과 동일하다."
+        required: true
+        type: string
+      namespace:
+        description: "배포 대상 k8s 네임스페이스"
+        required: true
+        type: string
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REGISTRY: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS 자격 증명 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ECR 로그인
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker Buildx 준비
+        uses: docker/setup-buildx-action@v3
+
+      # 기존에 로컬에서 손으로 하던 `docker build && docker push`를 그대로 대체한다.
+      # 태그를 latest / 커밋 SHA 두 개로 남겨서, 나중에 "어느 커밋이 배포됐는지" 추적 가능하게 한다.
+      - name: 이미지 빌드 & ECR 푸시
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: services/${{ inputs.service_name }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ inputs.service_name }}:latest
+            ${{ env.ECR_REGISTRY }}/${{ inputs.service_name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: kubectl 설치
+        uses: azure/setup-kubectl@v4
+
+      - name: kubeconfig 연결 (EKS)
+        run: aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      # 이미지 태그를 latest가 아닌 "이번에 빌드한 커밋 SHA"로 명시적으로 지정한다.
+      # latest 태그만 믿고 재배포하면 "재배포했는데 이전 이미지가 캐시로 남아있는" 문제가 생길 수 있어서,
+      # 배포 시점에는 항상 이번 워크플로우가 만든 정확한 이미지를 지정한다.
+      - name: 새 이미지로 롤링 업데이트
+        run: |
+          kubectl set image deployment/${{ inputs.service_name }} \
+            ${{ inputs.service_name }}=${{ env.ECR_REGISTRY }}/${{ inputs.service_name }}:${{ github.sha }} \
+            -n ${{ inputs.namespace }}
+
+      - name: 롤아웃 상태 확인
+        run: |
+          kubectl rollout status deployment/${{ inputs.service_name }} \
+            -n ${{ inputs.namespace }} --timeout=180s

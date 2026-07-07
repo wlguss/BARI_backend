@@ -1,0 +1,23 @@
+name: Deploy user-service
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "services/user-service/**"
+      - "libs/**"
+      - ".github/workflows/deploy-user-service.yml"
+      - ".github/workflows/deploy-service.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-user-service
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      service_name: user-service
+      namespace: user-service
+    secrets: inherit
