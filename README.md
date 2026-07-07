@@ -41,6 +41,10 @@ bari-backend/
 │   ├── msa_zookeeper.yaml       # Zookeeper Deployment + Service
 │   ├── msa_redis.yaml           # Redis Deployment + Service (redis 네임스페이스)
 │   └── msa_ingress.yaml         # ALB Ingress (gateway 네임스페이스)
+├── .github/
+│   └── workflows/
+│       ├── deploy-service.yml          # 실제 빌드/배포 로직 (재사용 워크플로우)
+│       └── deploy-{서비스명}.yml x 7   # 서비스별 트리거 + deploy-service.yml 호출
 ├── postman/
 │   └── bari-backend.collection.json   # Postman 컬렉션 (전체 API)
 ├── libs/                        # 공유 라이브러리 모듈
@@ -340,8 +344,8 @@ curl -H "X-User-Id: 1" -H "X-User-Role: USER" http://localhost:8082/api/stores
 
 ## k8s 배포
 
-현재는 **전부 수동 배포**(kubectl 직접 실행) 상태이며, GitHub Actions 등 CI/CD 자동화는 아직 붙어 있지 않다.
-아래 순서를 위에서부터 그대로 따라가면 클러스터에 처음부터 전체 스택을 올릴 수 있다.
+아래는 **클러스터를 처음부터 세팅할 때 손으로 하는 수동 배포 절차**다. 최초 1회 인프라 구축이나 트러블슈팅 시 이 순서를 그대로 따라가면 된다.
+이후 코드 변경에 따른 반복 배포는 [CI/CD (GitHub Actions)](#cicd-github-actions) 섹션의 자동화가 대신 처리한다.
 
 ### 0. 배포 전 인프라 전제조건
 
@@ -480,6 +484,70 @@ curl http://<ALB주소>/actuator/health
 ```
 
 각 서비스 Secret(`*-service-secret.yaml`)에 다른 서비스의 `_HOST`/`_PORT`가 이 DNS 규칙으로 미리 박혀 있다.
+
+---
+
+## CI/CD (GitHub Actions)
+
+위 "k8s 배포"의 수동 절차 중 **이미지 빌드 → ECR 푸시 → 클러스터에 새 이미지 반영** 세 단계를 `dev` 브랜치 push에 맞춰 자동화한 것이다.
+Secret 생성(3번)이나 최초 Deployment/Service 적용(4~5번) 같은 "인프라를 처음 만드는" 작업은 CI/CD 대상이 아니며 여전히 수동이다. CI/CD는 어디까지나 **이미 떠 있는 Deployment의 이미지를 새 버전으로 교체**하는 역할만 한다.
+
+### 동작 방식
+
+```
+services/order-service/** 변경분을 dev 브랜치에 push
+        │
+        ▼  (경로 필터에 걸려서 deploy-order-service.yml 만 실행됨)
+[1] 소스 체크아웃
+[2] AWS 자격 증명 설정 (Secrets: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY)
+[3] ECR 로그인
+[4] Docker 이미지 빌드 (services/order-service/Dockerfile 그대로 사용)
+[5] ECR에 푸시 — :latest 태그와 :{커밋SHA} 태그 두 개
+[6] EKS에 kubeconfig 연결 (Secrets: EKS_CLUSTER_NAME)
+[7] kubectl set image deployment/order-service order-service=<이미지>:{커밋SHA} -n order-service
+[8] kubectl rollout status 로 롤링 업데이트 성공 여부 확인
+```
+
+- `latest`가 아니라 **커밋 SHA 태그로 배포**한다. `latest`만 믿고 재배포를 트리거하면 "재배포했는데 이전 이미지가 그대로 떠 있는" 문제가 생길 수 있어서, 이번에 빌드한 이미지를 정확히 지정해 배포한다. (`:latest` 태그는 디버깅 시 `docker pull ...:latest`로 최신 이미지를 바로 당겨보기 편하도록 같이 남겨둔다.)
+- 서비스마다 `paths:` 필터가 걸려 있어 **자기 서비스 코드가 바뀔 때만** 해당 워크플로우가 실행된다. 단, 모든 서비스가 공유하는 `libs/**`(공통 응답/예외/JWT)가 바뀌면 7개 서비스 워크플로우가 전부 실행된다.
+
+### 파일 구성
+
+```
+.github/workflows/
+├── deploy-service.yml            # 실제 빌드/배포 로직이 담긴 재사용 워크플로우 (workflow_call)
+├── deploy-api-gateway.yml        # 트리거 + deploy-service.yml 호출 (namespace: gateway)
+├── deploy-user-service.yml       # 〃                              (namespace: user-service)
+├── deploy-store-service.yml      # 〃                              (namespace: store-service)
+├── deploy-product-service.yml    # 〃                              (namespace: product-service)
+├── deploy-inventory-service.yml  # 〃                              (namespace: inventory-service)
+├── deploy-discount-service.yml   # 〃                              (namespace: discount-service)
+└── deploy-order-service.yml      # 〃                              (namespace: order-service)
+```
+
+7개 서비스의 빌드/배포 절차가 완전히 동일(이름과 네임스페이스만 다름)하기 때문에, 실제 로직은 `deploy-service.yml` 하나에만 두고 나머지 7개는 "언제 실행할지"와 "어떤 서비스인지"만 짧게 지정해 재사용 워크플로우를 호출한다. 각 파일은 `workflow_dispatch`도 열어 두어서 GitHub Actions 탭에서 수동으로도 재실행할 수 있다.
+
+### ⚠️ 최초 1회 GitHub 설정 (코드로 대신할 수 없는 부분)
+
+워크플로우 파일만으로는 동작하지 않는다. 저장소의 `Settings → Secrets and variables → Actions`에 아래 3개를 등록해야 CI가 AWS에 접근할 수 있다.
+
+| Secret 이름 | 값 | 용도 |
+| --- | --- | --- |
+| `AWS_ACCESS_KEY_ID` | ECR push + EKS 배포 권한이 있는 IAM 사용자의 액세스 키 | AWS 인증 |
+| `AWS_SECRET_ACCESS_KEY` | 위 IAM 사용자의 시크릿 키 | AWS 인증 |
+| `EKS_CLUSTER_NAME` | 실제 EKS 클러스터 이름 | `aws eks update-kubeconfig`에 사용 |
+
+해당 IAM 사용자는 최소한 `ecr:GetAuthorizationToken`/`ecr:BatchCheckLayerAvailability`/`ecr:PutImage` 등 ECR 푸시 권한과, EKS 클러스터의 aws-auth ConfigMap에 등록되어 `kubectl` 명령을 수행할 수 있는 권한이 있어야 한다.
+
+### 배포 확인 / 롤백
+
+```bash
+# Actions 탭 대신 CLI로 롤아웃 이력 확인
+kubectl rollout history deployment/order-service -n order-service
+
+# 방금 배포가 잘못됐다면 직전 버전으로 롤백
+kubectl rollout undo deployment/order-service -n order-service
+```
 
 ---
 

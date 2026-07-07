@@ -1,0 +1,23 @@
+name: Deploy inventory-service
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "services/inventory-service/**"
+      - "libs/**"
+      - ".github/workflows/deploy-inventory-service.yml"
+      - ".github/workflows/deploy-service.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-inventory-service
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      service_name: inventory-service
+      namespace: inventory-service
+    secrets: inherit

@@ -1,0 +1,23 @@
+name: Deploy discount-service
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "services/discount-service/**"
+      - "libs/**"
+      - ".github/workflows/deploy-discount-service.yml"
+      - ".github/workflows/deploy-service.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-discount-service
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      service_name: discount-service
+      namespace: discount-service
+    secrets: inherit

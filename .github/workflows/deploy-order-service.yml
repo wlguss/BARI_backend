@@ -1,0 +1,23 @@
+name: Deploy order-service
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "services/order-service/**"
+      - "libs/**"
+      - ".github/workflows/deploy-order-service.yml"
+      - ".github/workflows/deploy-service.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-order-service
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      service_name: order-service
+      namespace: order-service
+    secrets: inherit

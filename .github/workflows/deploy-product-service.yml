@@ -1,0 +1,23 @@
+name: Deploy product-service
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "services/product-service/**"
+      - "libs/**"
+      - ".github/workflows/deploy-product-service.yml"
+      - ".github/workflows/deploy-service.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-product-service
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      service_name: product-service
+      namespace: product-service
+    secrets: inherit
