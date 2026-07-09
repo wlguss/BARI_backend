@@ -165,6 +165,21 @@ bari-backend/
 - **Docker** 및 **Docker Compose**
 - (선택) IntelliJ IDEA 또는 VS Code
 
+### 0. 환경변수 파일(.env) 준비
+
+민감한 값(DB 비밀번호, JWT 시크릿 등)은 git에 커밋되지 않는 `.env` 파일로 관리합니다.
+최초 1회만 아래처럼 템플릿을 복사해서 값을 채워주면 됩니다 (기본값 그대로 써도 로컬 실행에는 문제없습니다).
+
+```bash
+# 서비스(gradlew bootRun)용 - 저장소 루트에 위치
+cp .env.example .env
+
+# docker-compose 인프라(MariaDB, RabbitMQ)용
+cp docker/.env.example docker/.env
+```
+
+두 파일 모두 `.gitignore`에 의해 git에 커밋되지 않습니다. `.env`의 값은 `./gradlew bootRun` 실행 시 자동으로 각 서비스의 환경변수로 주입되고, `docker/.env`의 값은 `docker compose` 실행 시 자동으로 반영됩니다.
+
 ### 1. Docker 인프라 실행
 
 ```bash

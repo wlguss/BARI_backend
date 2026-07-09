@@ -11,6 +11,10 @@
 #
 # [컨테이너만 재시작 (데이터 유지)]
 # docker compose -f docker/docker-compose.yml restart
+#
+# [사전 준비]
+# docker/.env.example을 복사해 docker/.env 생성 후 값 채우기 (docker/.env는 git에 커밋되지 않음)
+# cp docker/.env.example docker/.env
 # ============================================================
 
 name: bari-backend
@@ -21,9 +25,9 @@ services:
     image: mariadb:11.4
     container_name: bari-mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: root1234
-      MYSQL_DATABASE: bari
-      MYSQL_USER: bari
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root1234}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bari}
+      MYSQL_USER: ${MYSQL_USER:-bari}
     ports:
       - "3306:3306"
     volumes:
@@ -76,8 +80,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: bari
-      RABBITMQ_DEFAULT_PASS: bari1234
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-bari}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-bari1234}
 
 # 컨테이너를 재시작하거나 삭제해도 DB/redis 데이터는 유지
 volumes:

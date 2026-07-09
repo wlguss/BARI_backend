@@ -41,7 +41,7 @@ spring:
             - Path=/api/orders/**, /api/store/orders/**
 
 jwt:
-  secret: bari-super-secret-key-must-be-at-least-32-chars
+  secret: ${JWT_SECRET:bari-super-secret-key-must-be-at-least-32-chars}
 
 logging:
   level:
