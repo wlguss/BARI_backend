@@ -4,6 +4,24 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
 }
 
+// 루트 .env 파일을 파싱해 Map으로 반환한다.
+// 로컬 전용 파일이라 git에는 커밋되지 않으므로(.gitignore), 없으면 빈 Map을 반환해 정상 동작한다.
+def loadEnvFile(File file) {
+    def env = [:]
+    if (file.exists()) {
+        file.eachLine { line ->
+            line = line.trim()
+            if (line && !line.startsWith('#')) {
+                def idx = line.indexOf('=')
+                if (idx > 0) {
+                    env[line.substring(0, idx).trim()] = line.substring(idx + 1).trim()
+                }
+            }
+        }
+    }
+    return env
+}
+
 subprojects {
     apply plugin: 'java'
 
@@ -25,4 +43,10 @@ subprojects {
     tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+    // bootRun 실행 시 루트 .env 파일의 값을 환경변수로 주입한다.
+    // (Spring Boot 플러그인이 적용된 서비스 모듈에만 bootRun 태스크가 존재하므로 나머지 모듈에는 영향 없음)
+    tasks.matching { it.name == 'bootRun' }.configureEach {
+        environment(loadEnvFile(rootProject.file('.env')))
+    }
 }
