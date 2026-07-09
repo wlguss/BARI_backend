@@ -25,59 +25,11 @@ spec:
           ports:
             - containerPort: 8081
 
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "prod"
-
-            - name: JAVA_OPTS
-              value: "-Xms128m -Xmx256m"
-
-            - name: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
-              value: "2"
-            - name: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
-              value: "1"
-
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DB_HOST
-
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DB_PORT
-
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DB_NAME
-
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DB_USERNAME
-
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DB_PASSWORD
-
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: JWT_SECRET
-
-            - name: REDIS_HOST
-              value: "redis.redis.svc.cluster.local"
-
-            - name: REDIS_PORT
-              value: "6379"
+          envFrom:
+            - secretRef:
+                name: bari-app-secrets      # DB_*, JWT_SECRET 등 민감값
+            - configMapRef:
+                name: bari-app-config       # SPRING_PROFILES_ACTIVE, JAVA_OPTS, REDIS_HOST, 내부 DNS 주소 등 비민감값
 
           readinessProbe:
             httpGet:

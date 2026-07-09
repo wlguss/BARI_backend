@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bari-app-config
+  namespace: product-service
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  JAVA_OPTS: "-Xms128m -Xmx256m"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "2"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"

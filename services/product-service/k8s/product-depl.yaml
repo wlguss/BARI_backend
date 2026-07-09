@@ -26,11 +26,6 @@ spec:
             - containerPort: 8083
           envFrom:
             - secretRef:
-                name: bari-app-secrets
-          env:
-            - name: JAVA_OPTS
-              value: "-Xms128m -Xmx256m"
-            - name: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
-              value: "2"
-            - name: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
-              value: "1"
+                name: bari-app-secrets      # DB_*, JWT_SECRET 등 민감값
+            - configMapRef:
+                name: bari-app-config       # JAVA_OPTS, Hikari 설정 등 비민감값

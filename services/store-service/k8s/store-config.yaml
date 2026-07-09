@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bari-app-config
+  namespace: store-service
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  JAVA_OPTS: "-Xms128m -Xmx256m"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "2"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "1"
+
+  # 클러스터 내부 DNS 주소 (민감정보 아님)
+  DISCOUNT_SERVICE_HOST: "discount-service.discount-service.svc.cluster.local"
+  DISCOUNT_SERVICE_PORT: "8085"
