@@ -24,71 +24,8 @@ spec:
           image: 260956700310.dkr.ecr.ap-northeast-2.amazonaws.com/api-gateway:latest
           ports:
             - containerPort: 8080
-          env:
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: JWT_SECRET
-            - name: STORE_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: STORE_SERVICE_HOST
-            - name: STORE_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: STORE_SERVICE_PORT
-            - name: PRODUCT_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: PRODUCT_SERVICE_HOST
-            - name: PRODUCT_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: PRODUCT_SERVICE_PORT
-
-            - name: INVENTORY_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: INVENTORY_SERVICE_HOST
-            - name: INVENTORY_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: INVENTORY_SERVICE_PORT
-
-            - name: USER_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: USER_SERVICE_HOST
-            - name: USER_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: USER_SERVICE_PORT
-            - name: DISCOUNT_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DISCOUNT_SERVICE_HOST
-            - name: DISCOUNT_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: DISCOUNT_SERVICE_PORT
-            - name: ORDER_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: ORDER_SERVICE_HOST
-            - name: ORDER_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: bari-app-secrets
-                  key: ORDER_SERVICE_PORT
+          envFrom:
+            - secretRef:
+                name: bari-app-secrets      # JWT_SECRET 등 민감값
+            - configMapRef:
+                name: bari-app-config       # 각 서비스 내부 DNS 주소 등 비민감값
