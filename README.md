@@ -174,7 +174,7 @@ bari-backend/
 # 서비스(gradlew bootRun)용 - 저장소 루트에 위치
 cp .env.example .env
 
-# docker-compose 인프라(MariaDB, RabbitMQ)용
+# docker-compose 인프라(MariaDB, Redis, Kafka, Zookeeper, RabbitMQ)용
 cp docker/.env.example docker/.env
 ```
 
@@ -654,85 +654,50 @@ curl http://localhost:8086/actuator/health  # order-service
 
 ## 아키텍처 다이어그램
 
+### 요청 흐름 & 서비스 간 동기 통신
+
 ```mermaid
-flowchart TB
+flowchart LR
     Client(["클라이언트"])
+    GW["api-gateway\n:8080"]
+    US["user-service\n:8081"]
+    SS["store-service\n:8082"]
+    PS["product-service\n:8083"]
+    IS["inventory-service\n:8084"]
+    DS["discount-service\n:8085"]
+    OS["order-service\n:8086"]
 
-    subgraph Gateway["API Gateway :8080"]
-        GW["Spring Cloud Gateway\n━━━━━━━━━━━━━━\n• JWT 검증\n• X-User-Id 헤더 주입\n• 라우팅"]
-    end
+    Client -->|"JWT"| GW
+    Client -->|"로그인/회원가입"| US
+    GW --> SS & PS & IS & DS & OS
 
-    subgraph UserSvc["user-service :8081"]
-        US["• 회원가입 / 로그인\n• JWT 발급 / 갱신\n• JwtAuthenticationFilter"]
-    end
-
-    subgraph StoreSvc["store-service :8082"]
-        SS["• 매장 관리\n• 찜하기 / 찜해제\n• 찜한 매장 할인 임박 조회"]
-    end
-
-    subgraph ProductSvc["product-service :8083"]
-        PS["• 상품 관리\n• Kafka 이벤트 발행"]
-    end
-
-    subgraph InventorySvc["inventory-service :8084"]
-        IS["• 재고 관리\n• Kafka 재고 차감 처리"]
-    end
-
-    subgraph DiscountSvc["discount-service :8085"]
-        DS["• 할인 관리\n• 찜한 매장 할인 임박 조회\n(product + inventory Feign)"]
-    end
-
-    subgraph OrderSvc["order-service :8086"]
-        OS["• 주문 예약 / 취소\n• Kafka 이벤트 발행"]
-    end
-
-    subgraph Infra["Infrastructure"]
-        Redis[("Redis\nRefresh Token")]
-        DB[("MariaDB\n단일 스키마")]
-        Kafka["Kafka\norder.reserved\norder.cancelled"]
-    end
-
-    subgraph Libs["libs (공통 라이브러리)"]
-        Common["libs:common\nApiResponse / BusinessException\nBaseTimeEntity"]
-        Security["libs:security\nJwtProvider / HeaderAuthenticationFilter\n@CurrentUserId"]
-    end
-
-    %% 외부 요청 흐름
-    Client -->|"Authorization: Bearer JWT"| Gateway
-    GW -->|"X-User-Id / X-User-Role"| StoreSvc
-    GW -->|"X-User-Id / X-User-Role"| ProductSvc
-    GW -->|"X-User-Id / X-User-Role"| InventorySvc
-    GW -->|"X-User-Id / X-User-Role"| DiscountSvc
-    GW -->|"X-User-Id / X-User-Role"| OrderSvc
-    Client -->|"로그인 / 회원가입"| UserSvc
-
-    %% 서비스 간 동기 통신
-    OS -->|"RestClient (재고확인)"| InventorySvc
-    OS -->|"RestClient (상품확인)"| ProductSvc
-    OS -->|"RestClient (매장확인)"| StoreSvc
-    SS -->|"RestClient (임박할인조회)"| DiscountSvc
-    DS -->|"OpenFeign (재고조회)"| InventorySvc
-    DS -->|"OpenFeign (상품조회)"| ProductSvc
-    IS -->|"OpenFeign (상품확인)"| ProductSvc
-
-    %% Kafka 비동기
-    OS -.->|"order.reserved"| Kafka
-    Kafka -.->|"재고 차감"| InventorySvc
-
-    %% 인프라 연결
-    US <--> Redis
-    US <--> DB
-    SS <--> DB
-    PS <--> DB
-    IS <--> DB
-    DS <--> DB
-    OS <--> DB
-
-    %% libs 의존
-    StoreSvc -. "implementation" .-> Libs
-    ProductSvc -. "implementation" .-> Libs
-    InventorySvc -. "implementation" .-> Libs
-    DiscountSvc -. "implementation" .-> Libs
-    OrderSvc -. "implementation" .-> Libs
-    UserSvc -. "implementation" .-> Libs
+    OS -->|"재고확인"| IS
+    OS -->|"상품확인"| PS
+    OS -->|"매장확인"| SS
+    SS -->|"임박할인조회"| DS
+    DS -->|"재고/상품조회"| IS
+    DS -->|"재고/상품조회"| PS
+    IS -->|"상품확인"| PS
 ```
+
+- **api-gateway**: JWT 검증 + `X-User-Id` 헤더 주입 후 각 서비스로 라우팅
+- **user-service**: 회원가입/로그인/JWT 발급은 게이트웨이를 거치지 않고 직접 호출
+- 서비스 간 호출은 `RestClient`(order-service) 또는 `OpenFeign`(discount/inventory-service) 사용
+
+### 비동기 이벤트 & 인프라 연결
+
+```mermaid
+flowchart LR
+    OS["order-service"] -.->|"order.reserved\norder.cancelled"| K[("Kafka")]
+    K -.->|"재고 차감"| IS["inventory-service"]
+
+    US["user-service"] --> R[("Redis\nRefresh Token")]
+    US --> DB[("MariaDB")]
+    SS["store-service"] --> DB
+    PS["product-service"] --> DB
+    IS --> DB
+    DS["discount-service"] --> DB
+    OS --> DB
+```
+
+> 모든 서비스는 `libs:common`(공통 응답/예외), `libs:security`(JWT 인증)에 공통으로 의존합니다.
